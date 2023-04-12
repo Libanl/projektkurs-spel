@@ -1,21 +1,31 @@
+# Makefile for Windows
 
-INCLUDE = C:\msys64\mingw64\include\SDL2
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -mwindows -lm
+# Location of where hello.c is stored in
+SRCDIR=./src
 
-rocket: main.o rocket.o stars.o asteroid.o text.o
-	gcc -o rocket main.o rocket.o stars.o asteroid.o text.o $(LDFLAGS)
+# Name of the compiler, GNU GCC in this case
+CC=gcc
 
-main.o: ./src/main.c
-	gcc -c -I$(INCLUDE) ./src/main.c
+# Any include directories
+# INCLUDE = ./lib/macos/include
+INCLUDE = C:\msys64\mingw64\include
 
-rocket.o: ./src/rocket.c ./include/rocket.h
-	gcc -c -I$(INCLUDE) ./src/rocket.c
+# Any flags for the compiler
+#CFLAGS = -g -I$(INCLUDE) -c
+CFLAGS = -g -c
 
-stars.o: ./src/stars.c ./include/stars.h
-	gcc -c -I$(INCLUDE) ./src/stars.c
+# Any libraries to link with
+#LIBS = C:\msys64\mingw64\lib
 
-asteroid.o: ./src/asteroid.c ./include/asteroid.h
-	gcc -c -I$(INCLUDE) ./src/asteroid.c
+# Extra flags to give to compilers when they are supposed to invoke the linker
+# NOTE ORDER OF THE FLAGS MATTERS!
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -mwindows
 
-text.o: ./src/text.c ./include/text.h
-	gcc -c -I$(INCLUDE) ./src/text.c
+main:
+	@echo "Building Hello"
+	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o main.o 
+	$(CC) main.o -o main $(LDFLAGS)
+
+clean:
+	rm main
+	rm main.o
