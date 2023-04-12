@@ -21,9 +21,9 @@ CFLAGS = -g -c
 # NOTE ORDER OF THE FLAGS MATTERS!
 LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -mwindows
 
-hello:
+main:
 	@echo "Building Hello"
-	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o $@.o 
+	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o main.o 
 	$(CC) main.o -o main $(LDFLAGS)
 
 clean:

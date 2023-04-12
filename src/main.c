@@ -1,11 +1,11 @@
 
 #include <stdio.h>
+#include <SDL2/SDL.h>
 
 int main(int argv, char** args)
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    SDL_Window *window = SDL_CreateWindow("Yo SDL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
+    
+    SDL_Window *window = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
 
     int isRunning = 1;
