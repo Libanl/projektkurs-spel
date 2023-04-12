@@ -19,7 +19,7 @@ CFLAGS = -g -c
 
 # Extra flags to give to compilers when they are supposed to invoke the linker
 # NOTE ORDER OF THE FLAGS MATTERS!
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -mwindows
 
 main:
 	@echo "Building Hello"
