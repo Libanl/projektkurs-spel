@@ -9,26 +9,11 @@
 int main(int argv, char **args)
 {
     SDL_Window *window = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
-     if(!window){
-        printf("Error! Renderer failed\n", IMG_GetError());
-        return 1;
-    }
-
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-<<<<<<< HEAD
-    if(!renderer){
-        printf("Error! Renderer failed\n", IMG_GetError());
-        return 1;
-    }
-
-    SDL_Surface* backgroundImage = IMG_Load("C:/Users/46729/Documents/GitHub/projektkurs-spel/resources/28256.jpg");
-    if(!backgroundImage){
-=======
 
     SDL_Surface *backgroundImage = IMG_Load("resources/28256.jpg");
     if (!backgroundImage)
     {
->>>>>>> libans-branch
         printf("Error! BackgroundImage failed\n", IMG_GetError());
         return 1;
     }
@@ -87,11 +72,8 @@ int main(int argv, char **args)
         updateZombies(zombieRect, 3); // update the zombies' positions
 
         SDL_RenderClear(renderer);
-<<<<<<< HEAD
-=======
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
->>>>>>> libans-branch
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
 
         // Render all zombies
