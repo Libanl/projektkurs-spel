@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <time.h>
@@ -34,6 +35,16 @@ void updateZombies(SDL_Rect *zombieRect, int size)
         }
     }
 }
+=======
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include "../includes/zombie.h" // include the zombies header file
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+>>>>>>> libans-branch
 
 void spawn_zombies(SDL_Rect *zombieRects, int numZombies, SDL_Surface *zombieImage, SDL_Texture *zombieTexture, int screenWidth, int screenHeight)
 {
@@ -65,6 +76,7 @@ void render_zombies(SDL_Renderer *renderer, SDL_Texture *zombieTexture, SDL_Rect
         SDL_RenderCopy(renderer, zombieTexture, NULL, &zombieRects[i]);
     }
 }
+<<<<<<< HEAD
 void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, int screenHeight)
 {
     // Seed the random number generator
@@ -79,22 +91,51 @@ void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, 
         zombieRect[i].y += randomY;
 
         // Keep the zombie within the screen boundaries
+=======
+
+void updateZombies(SDL_Rect *zombieRect, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        // Move the zombie rect by a random amount between -5 and 5 pixels horizontally
+        zombieRect[i].x += rand() % 11 - 5;
+
+        // Move the zombie rect by a random amount between -5 and 5 pixels vertically
+        zombieRect[i].y += rand() % 11 - 5;
+
+        // Make sure the zombie rect stays within the screen bounds
+>>>>>>> libans-branch
         if (zombieRect[i].x < 0)
         {
             zombieRect[i].x = 0;
         }
+<<<<<<< HEAD
         else if (zombieRect[i].x > screenWidth - zombieRect[i].w)
         {
             zombieRect[i].x = screenWidth - zombieRect[i].w;
         }
+=======
+>>>>>>> libans-branch
         if (zombieRect[i].y < 0)
         {
             zombieRect[i].y = 0;
         }
+<<<<<<< HEAD
         else if (zombieRect[i].y > screenHeight - zombieRect[i].h)
         {
             zombieRect[i].y = screenHeight - zombieRect[i].h;
         }
     }
 
+=======
+        if (zombieRect[i].x > 800 - zombieRect[i].w)
+        {
+            zombieRect[i].x = 800 - zombieRect[i].w;
+        }
+        if (zombieRect[i].y > 600 - zombieRect[i].h)
+        {
+            zombieRect[i].y = 600 - zombieRect[i].h;
+        }
+    }
+>>>>>>> libans-branch
 }
