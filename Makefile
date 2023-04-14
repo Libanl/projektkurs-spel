@@ -1,6 +1,6 @@
 # Makefile for Windows
 
-# Location of where hello.c is stored in
+# Location of where the source files are stored in
 SRCDIR=./src
 
 # Name of the compiler, GNU GCC in this case
@@ -21,11 +21,24 @@ CFLAGS = -g -c
 # NOTE ORDER OF THE FLAGS MATTERS!
 LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows
 
-main:
-	@echo "Building Hello"
-	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o main.o 
-	$(CC) main.o -o main $(LDFLAGS)
+# Source files
+SRCS = $(SRCDIR)/main.c $(SRCDIR)/zombie.c
 
+# Object files
+OBJS = $(SRCS:.c=.o)
+
+# Binary file
+MAIN = main
+
+# Rule for building the main binary
+$(MAIN): $(OBJS)
+	@echo "Building $(MAIN)"
+	$(CC) $(OBJS) -o $(MAIN) $(LDFLAGS)
+
+# Rule for building object files
+%.o: %.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -o $@ $<
+
+# Clean rule
 clean:
-	rm main
-	rm main.o
+	rm -f $(OBJS) $(MAIN)
