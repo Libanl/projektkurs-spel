@@ -49,7 +49,7 @@ int main(int argv, char **args)
         return 1;
     }
     
-    SDL_Surface *spelareImage = IMG_Load("resources/zombie.png");
+    SDL_Surface *spelareImage = IMG_Load("resources/soldier2.png");
     if(!spelareImage){
         printf("Error: %s\n",SDL_GetError());
         return 1;
@@ -60,6 +60,8 @@ int main(int argv, char **args)
         printf("Error: %s\n",SDL_GetError());
         return 1;
     }
+    SDL_Rect spelareRect = {WINDOW_WIDTH/2, WINDOW_HEIGHT/2, spelareImage->w/2, spelareImage->h/6};
+
 
     SDL_Rect zombieRect[3]; // create 3 zombies
     for (int i = 0; i < 3; i++)
@@ -71,7 +73,6 @@ int main(int argv, char **args)
     }
 
     Spelare *spelare1 = createSpelare(WINDOW_WIDTH/2,WINDOW_HEIGHT/2, pRenderer,WINDOW_WIDTH,WINDOW_HEIGHT);
-
 
     int isRunning = 1;
     SDL_Event event;
@@ -94,7 +95,7 @@ int main(int argv, char **args)
         SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255);
 
         SDL_RenderCopy(pRenderer, backgroundTexture, NULL, NULL);
-        SDL_RenderCopy(pRenderer,spelareTexture, NULL, NULL);
+        SDL_RenderCopy(pRenderer,spelareTexture, NULL, &spelareRect);
 
         // Render all zombies
         for (int i = 0; i < 3; i++)
