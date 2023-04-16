@@ -5,12 +5,22 @@
 #include <SDL2/SDL_image.h>
 #include "../includes/zombie.h" // include the zombies header file
 #include "../includes/spelare.h"
+#include "../includes/music.h"
 #define WINDOW_WIDTH 300
 #define WINDOW_HEIGHT 250
 
 
 int main(int argv, char **args)
 {
+    if (initMus() == -1)
+    {
+        printf("Kunde inte initiera ljudsystemet!\n");
+        return 1;
+    }
+
+    playMus("resources/spel.MP3");
+    
+    
     SDL_Window *window = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
     SDL_Renderer *pRenderer = SDL_CreateRenderer(window, -1, 0);
     
@@ -109,6 +119,8 @@ int main(int argv, char **args)
         SDL_Delay(10); // add 10 millisecond delay
     }
 
+    stopMus();
+    cleanMu();
     SDL_DestroyTexture(spelareTexture);
     SDL_FreeSurface(spelareImage);
     SDL_DestroyTexture(backgroundTexture);
