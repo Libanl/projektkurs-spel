@@ -150,8 +150,8 @@ void run(Game *pGame)
             int randomY = rand() % WINDOW_HEIGHT;
             pGame->zombieRect[zombieCount].x = randomX;
             pGame->zombieRect[zombieCount].y = randomY;
-            pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 3;
-            pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 3;
+            pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 4;
+            pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 4;
             zombieCount++;
             lastSpawnTime = currentTime;
         }
