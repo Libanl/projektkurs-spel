@@ -9,16 +9,18 @@
 #include "../includes/music.h"
 #define WINDOW_WIDTH 300
 #define WINDOW_HEIGHT 250
+#define MAX_ZOMBIES 1000
 
-struct game{
+struct game
+{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare;
-    SDL_Rect zombieRect[5]; // create 3 zombies
+    SDL_Rect zombieRect[MAX_ZOMBIES]; // create 3 zombies
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
-    SDL_Surface *pZombieImage; 
-    SDL_Texture *pZombieTexture; 
+    SDL_Surface *pZombieImage;
+    SDL_Texture *pZombieTexture;
     SDL_Surface *pSpelareImage;
     SDL_Texture *pSpelareTexture;
 };
@@ -28,19 +30,21 @@ int initiate(Game *pGame);
 void run(Game *pGame);
 void close(Game *pGame);
 
-int main(int argv, char** args){
-    Game g={0};
-    if(!initiate(&g)) return 1;
+int main(int argv, char **args)
+{
+    Game g = {0};
+    if (!initiate(&g))
+        return 1;
     run(&g);
     close(&g);
 
     return 0;
 }
 
+int initiate(Game *pGame)
+{
 
-int initiate(Game *pGame){
-
-     if (initMus() == -1)
+    if (initMus() == -1)
     {
         printf("Kunde inte initiera ljudsystemet!\n");
         return 1;
@@ -99,8 +103,8 @@ int initiate(Game *pGame){
         return 1;
     }
 
-     // create 3 zombies
-    for (int i = 0; i < 5; i++)
+    // create 3 zombies
+    for (int i = 0; i < MAX_ZOMBIES; i++)
     {
         pGame->zombieRect[i].x = 100 + i * 200;
         pGame->zombieRect[i].y = 300;
@@ -111,9 +115,9 @@ int initiate(Game *pGame){
     Spelare *spelare1 = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
+void run(Game *pGame)
+{
 
-void run(Game *pGame){
-    
     SDL_Rect spelareRect = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pSpelareImage->w / 7, pGame->pSpelareImage->h / 16};
     int isRunning = 1;
     SDL_Event event;
@@ -127,10 +131,16 @@ void run(Game *pGame){
             case SDL_QUIT:
                 isRunning = 0;
                 break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    isRunning = 0;
+                }
+                break;
             }
         }
 
-        updateZombies(pGame->zombieRect, 5); // update the zombies' positions
+        updateZombies(pGame->zombieRect, MAX_ZOMBIES); // update the zombies' positions
 
         SDL_RenderClear(pGame->pRenderer);
         SDL_SetRenderDrawColor(pGame->pRenderer, 0, 0, 0, 255);
@@ -139,7 +149,7 @@ void run(Game *pGame){
         SDL_RenderCopy(pGame->pRenderer, pGame->pSpelareTexture, NULL, &spelareRect);
 
         // Render all zombies
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < MAX_ZOMBIES; i++)
         {
             SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
         }
@@ -151,17 +161,17 @@ void run(Game *pGame){
     }
 }
 
-    void close(Game *pGame){
-        stopMus();
-        cleanMu();
-        SDL_DestroyTexture(pGame->pSpelareTexture);
-        SDL_FreeSurface(pGame->pSpelareImage);
-        SDL_DestroyTexture(pGame->pbackgroundTexture);
-        SDL_FreeSurface(pGame->pbackgroundImage);
-        SDL_DestroyTexture(pGame->pZombieTexture);
-        SDL_FreeSurface(pGame->pZombieImage);
-        SDL_DestroyRenderer(pGame->pRenderer);
-        SDL_DestroyWindow(pGame->pWindow);
-        SDL_Quit();
-
-    }
+void close(Game *pGame)
+{
+    stopMus();
+    cleanMu();
+    SDL_DestroyTexture(pGame->pSpelareTexture);
+    SDL_FreeSurface(pGame->pSpelareImage);
+    SDL_DestroyTexture(pGame->pbackgroundTexture);
+    SDL_FreeSurface(pGame->pbackgroundImage);
+    SDL_DestroyTexture(pGame->pZombieTexture);
+    SDL_FreeSurface(pGame->pZombieImage);
+    SDL_DestroyRenderer(pGame->pRenderer);
+    SDL_DestroyWindow(pGame->pWindow);
+    SDL_Quit();
+}
