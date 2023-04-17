@@ -29,6 +29,7 @@ typedef struct game Game;
 int initiate(Game *pGame);
 void run(Game *pGame);
 void close(Game *pGame);
+void spawnZombies(Game *pGame);
 
 int main(int argv, char **args)
 {
@@ -104,13 +105,13 @@ int initiate(Game *pGame)
         return 1;
     }
 
-    for (int i = 0; i < MAX_ZOMBIES; i++)
+    /*for (int i = 0; i < MAX_ZOMBIES; i++)
     {
         pGame->zombieRect[i].x = 100 + i * 200;
         pGame->zombieRect[i].y = 300;
         pGame->zombieRect[i].w = pGame->pZombieImage->w / 2; // make zombies half size
         pGame->zombieRect[i].h = pGame->pZombieImage->h / 10;
-    }
+    }*/
 
     Spelare *spelare1 = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
@@ -144,7 +145,7 @@ void run(Game *pGame)
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
         {
-            // Spawn a new zombie at a random location
+            // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
             int randomX = rand() % WINDOW_WIDTH;
             int randomY = rand() % WINDOW_HEIGHT;
             pGame->zombieRect[zombieCount].x = randomX;
@@ -189,3 +190,24 @@ void close(Game *pGame)
     SDL_DestroyWindow(pGame->pWindow);
     SDL_Quit();
 }
+
+/*void spawnZombies(Game *pGame) //fixa
+{
+    static int zombieCount = 0;
+    static Uint32 lastSpawnTime = 0;
+
+    Uint32 currentTime = SDL_GetTicks();
+
+    if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
+    {
+        // Spawn a new zombie at a random location
+        int randomX = rand() % WINDOW_WIDTH;
+        int randomY = rand() % WINDOW_HEIGHT;
+        pGame->zombieRect[zombieCount].x = randomX;
+        pGame->zombieRect[zombieCount].y = randomY;
+        pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 3;
+        pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 3;
+        zombieCount++;
+        lastSpawnTime = currentTime;
+    }
+}*/
