@@ -9,7 +9,7 @@
 #include "../includes/music.h"
 #define WINDOW_WIDTH 300
 #define WINDOW_HEIGHT 250
-#define MAX_ZOMBIES 1000
+#define MAX_ZOMBIES 200
 
 struct game
 {
@@ -32,6 +32,7 @@ void close(Game *pGame);
 
 int main(int argv, char **args)
 {
+    srand(time(NULL));
     Game g = {0};
     if (!initiate(&g))
         return 1;
@@ -103,7 +104,6 @@ int initiate(Game *pGame)
         return 1;
     }
 
-    // create 3 zombies
     for (int i = 0; i < MAX_ZOMBIES; i++)
     {
         pGame->zombieRect[i].x = 100 + i * 200;
@@ -121,6 +121,8 @@ void run(Game *pGame)
     SDL_Rect spelareRect = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pSpelareImage->w / 7, pGame->pSpelareImage->h / 16};
     int isRunning = 1;
     SDL_Event event;
+    int zombieCount = 0;      // Keep track of the current number of zombies
+    Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
 
     while (isRunning)
     {
@@ -139,17 +141,29 @@ void run(Game *pGame)
                 break;
             }
         }
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
+        {
+            // Spawn a new zombie at a random location
+            int randomX = rand() % WINDOW_WIDTH;
+            int randomY = rand() % WINDOW_HEIGHT;
+            pGame->zombieRect[zombieCount].x = randomX;
+            pGame->zombieRect[zombieCount].y = randomY;
+            pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 3;
+            pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 3;
+            zombieCount++;
+            lastSpawnTime = currentTime;
+        }
 
-        updateZombies(pGame->zombieRect, MAX_ZOMBIES); // update the zombies' positions
+        updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
 
         SDL_RenderClear(pGame->pRenderer);
         SDL_SetRenderDrawColor(pGame->pRenderer, 0, 0, 0, 255);
-
         SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
         SDL_RenderCopy(pGame->pRenderer, pGame->pSpelareTexture, NULL, &spelareRect);
 
         // Render all zombies
-        for (int i = 0; i < MAX_ZOMBIES; i++)
+        for (int i = 0; i < zombieCount; i++)
         {
             SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
         }
