@@ -180,19 +180,19 @@ void run(Game *pGame)
         }
 
         // Update the position of the player rectangle based on the flag variables //if statements enable movement in two dimensions
-        if (isMovingUp)
+        if (isMovingUp && (spelareRect.y - 5) > 35)
         {
             spelareRect.y -= 5; // move up
         }
-        if (isMovingDown)
+        if (isMovingDown && (spelareRect.y + spelareRect.h + 5) < 710)
         {
             spelareRect.y += 5; // move down
         }
-        if (isMovingLeft)
+        if (isMovingLeft && (spelareRect.x - 5) > 0)
         {
             spelareRect.x -= 5; // move left
         }
-        if (isMovingRight)
+        if (isMovingRight && (spelareRect.x + spelareRect.w + 5) < WINDOW_WIDTH*3.35)
         {
             spelareRect.x += 5; // move right
         }
