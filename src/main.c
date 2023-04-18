@@ -179,7 +179,7 @@ void run(Game *pGame)
             }
         }
 
-        // Update the position of the player rectangle based on the flag variables
+        // Update the position of the player rectangle based on the flag variables //if statements enable movement in two dimensions
         if (isMovingUp)
         {
             spelareRect.y -= 5; // move up
