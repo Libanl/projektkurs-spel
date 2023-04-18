@@ -125,6 +125,11 @@ void run(Game *pGame)
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
 
+    int isMovingUp = 0;
+    int isMovingDown = 0;
+    int isMovingLeft = 0;
+    int isMovingRight = 0;
+
     while (isRunning)
     {
         while (SDL_PollEvent(&event))
@@ -135,13 +140,63 @@ void run(Game *pGame)
                 isRunning = 0;
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+                switch (event.key.keysym.sym)
                 {
+                case SDLK_ESCAPE:
                     isRunning = 0;
+                    break;
+                case SDLK_w:
+                    isMovingUp = 1;
+                    break;
+                case SDLK_s:
+                    isMovingDown = 1;
+                    break;
+                case SDLK_a:
+                    isMovingLeft = 1;
+                    break;
+                case SDLK_d:
+                    isMovingRight = 1;
+                    break;
+                }
+                break;
+            case SDL_KEYUP:
+                switch (event.key.keysym.sym)
+                {
+                case SDLK_w:
+                    isMovingUp = 0;
+                    break;
+                case SDLK_s:
+                    isMovingDown = 0;
+                    break;
+                case SDLK_a:
+                    isMovingLeft = 0;
+                    break;
+                case SDLK_d:
+                    isMovingRight = 0;
+                    break;
                 }
                 break;
             }
         }
+
+        // Update the position of the player rectangle based on the flag variables
+        if (isMovingUp)
+        {
+            spelareRect.y -= 5; // move up
+        }
+        if (isMovingDown)
+        {
+            spelareRect.y += 5; // move down
+        }
+        if (isMovingLeft)
+        {
+            spelareRect.x -= 5; // move left
+        }
+        if (isMovingRight)
+        {
+            spelareRect.x += 5; // move right
+        }
+
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
         {
