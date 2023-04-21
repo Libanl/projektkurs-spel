@@ -33,8 +33,8 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     }
 
     SDL_QueryTexture(pSpelare->pTexture, NULL, NULL, &(pSpelare->shipRect.w), &(pSpelare->shipRect.h));
-    pSpelare->shipRect.w /= 12;
-    pSpelare->shipRect.h /= 12;
+    pSpelare->shipRect.w = 16;
+    pSpelare->shipRect.h = 16;
     pSpelare->x = x - pSpelare->shipRect.w / 2;
     pSpelare->y = y - pSpelare->shipRect.h / 2;
     return pSpelare;

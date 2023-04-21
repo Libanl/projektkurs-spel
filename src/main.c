@@ -7,8 +7,8 @@
 #include "../includes/zombie.h" // include the zombies header file
 #include "../includes/spelare.h"
 #include "../includes/music.h"
-#define WINDOW_WIDTH 300
-#define WINDOW_HEIGHT 250
+#define WINDOW_WIDTH 1000
+#define WINDOW_HEIGHT 800
 #define MAX_ZOMBIES 200
 
 struct game
@@ -54,7 +54,7 @@ int initiate(Game *pGame)
 
     playMus("resources/spel.MP3");
 
-    pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 800, 0);
+    pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, 0);
 
     pGame->pbackgroundImage = IMG_Load("resources/28256.jpg");
@@ -113,7 +113,7 @@ int initiate(Game *pGame)
         pGame->zombieRect[i].h = pGame->pZombieImage->h / 10;
     }*/
 
-    Spelare *spelare1 = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 void run(Game *pGame)
@@ -180,11 +180,11 @@ void run(Game *pGame)
         }
 
         // Update the position of the player rectangle based on the flag variables //if statements enable movement in two dimensions
-        if (isMovingUp && (spelareRect.y - 5) > 35)
+        if (isMovingUp && (spelareRect.y - 5) > 0)
         {
             spelareRect.y -= 5; // move up
         }
-        if (isMovingDown && (spelareRect.y + spelareRect.h + 5) < 710)
+        if (isMovingDown && (spelareRect.y + spelareRect.h + 5) < 800)
         {
             spelareRect.y += 5; // move down
         }
@@ -192,7 +192,7 @@ void run(Game *pGame)
         {
             spelareRect.x -= 5; // move left
         }
-        if (isMovingRight && (spelareRect.x + spelareRect.w + 5) < WINDOW_WIDTH*3.35)
+        if (isMovingRight && (spelareRect.x + spelareRect.w + 5) < WINDOW_WIDTH)
         {
             spelareRect.x += 5; // move right
         }
@@ -203,6 +203,12 @@ void run(Game *pGame)
             // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
             int randomX = rand() % WINDOW_WIDTH;
             int randomY = rand() % WINDOW_HEIGHT;
+            int randomEdge = rand()%4;
+            if(randomEdge==0) randomX=0;
+            else if (randomEdge==1) randomY=0;
+            else if (randomEdge==2) randomX=1200;
+            else if (randomEdge==3) randomY=1000;
+
             pGame->zombieRect[zombieCount].x = randomX;
             pGame->zombieRect[zombieCount].y = randomY;
             pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 4;
