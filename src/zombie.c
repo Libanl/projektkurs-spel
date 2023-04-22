@@ -25,10 +25,10 @@ void updateZombies(SDL_Rect *zombieRect, int size)
     for (int i = 0; i < size; i++)
     {
         // Move the zombie rect by a random amount between -5 and 5 pixels horizontally
-        zombieRect[i].x += rand() % 11 - 5;
+        //zombieRect[i].x += rand() % 11 - 5;
 
         // Move the zombie rect by a random amount between -5 and 5 pixels vertically
-        zombieRect[i].y += rand() % 11 - 5;
+        //zombieRect[i].y += rand() % 11 - 5;
 
         // Make sure the zombie rect stays within the screen bounds
         if (zombieRect[i].x < 0)
@@ -39,13 +39,13 @@ void updateZombies(SDL_Rect *zombieRect, int size)
         {
             zombieRect[i].y = 0;
         }
-        if (zombieRect[i].x > 800 - zombieRect[i].w)
+        if (zombieRect[i].x > 1000 - zombieRect[i].w)
         {
-            zombieRect[i].x = 800 - zombieRect[i].w;
+            zombieRect[i].x = 1000 - zombieRect[i].w;
         }
-        if (zombieRect[i].y > 600 - zombieRect[i].h)
+        if (zombieRect[i].y > 750 - zombieRect[i].h)
         {
-            zombieRect[i].y = 600 - zombieRect[i].h;
+            zombieRect[i].y = 750 - zombieRect[i].h;
         }
     }
 }
