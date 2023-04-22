@@ -6,17 +6,16 @@
 #include <SDL2/SDL_mixer.h>
 #include "../includes/music.h"
 
-Mix_Music* music = NULL;
+Mix_Music *music = NULL;
 
 int initMus()
 {
-if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,  2048) < 0)
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
         printf("SDL_mixer kunde inte initieras! SDL_mixer Error: %s\n", Mix_GetError());
         return -1;
     }
     return 0;
-    
 }
 
 void playMus(const char *filename)
@@ -35,5 +34,3 @@ void cleanMu()
 {
     Mix_CloseAudio();
 }
-
-
