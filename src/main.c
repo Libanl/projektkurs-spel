@@ -12,27 +12,19 @@
 #define WINDOW_HEIGHT 750
 #define MAX_ZOMBIES 200
 
-struct game
-{
+struct game{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare;
     SDL_Rect zombieRect[MAX_ZOMBIES];
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
-<<<<<<< HEAD
-    SDL_Surface *pZombieImage;
-    SDL_Texture *pZombieTexture;
-    SDL_Surface *pSpelareImage;
-    SDL_Texture *pSpelareTexture;
-=======
     SDL_Surface *pZombieImage; 
     SDL_Texture *pZombieTexture;
     int MoveUp;
     int MoveLeft;
     int MoveDown;
     int MoveRight;
->>>>>>> 97109238b9cadc2d8c6e5d4c9c92e1a73c38d574
 };
 typedef struct game Game;
 
@@ -41,21 +33,20 @@ void run(Game *pGame);
 void close(Game *pGame);
 void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 
-int main(int argv, char **args)
-{
-    Game g = {0};
-    if (!initiate(&g))
-        return 1;
+
+int main(int argv, char** args){
+    Game g={0};
+    if(!initiate(&g)) return 1;
     run(&g);
     close(&g);
 
     return 0;
 }
 
-int initiate(Game *pGame)
-{
 
-    if (initMus() == -1)
+int initiate(Game *pGame){
+
+     if (initMus() == -1)
     {
         printf("Kunde inte initiera ljudsystemet!\n");
         return 1;
@@ -103,20 +94,21 @@ int initiate(Game *pGame)
     pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
-void run(Game *pGame)
-{
 
+
+void run(Game *pGame){
+    
     int keys[SDL_NUM_SCANCODES] = {0}; // Initialize an array to store key states
     int isRunning = 1;
     SDL_Event event;
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
     while (isRunning)
-    {
-        // updateSpelare(pGame->pSpelare);
-
+    {   
+        //updateSpelare(pGame->pSpelare);
+        
         while (SDL_PollEvent(&event))
-        {
+        {   
             switch (event.type)
             {
             case SDL_QUIT:
@@ -127,8 +119,7 @@ void run(Game *pGame)
                 {
                     isRunning = 0;
                 }
-            default:
-                handleInput(&event, pGame, keys);
+            default: handleInput(&event,pGame,keys);
                 break;
             }
         }
@@ -139,15 +130,11 @@ void run(Game *pGame)
             // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
             int randomX = rand() % WINDOW_WIDTH;
             int randomY = rand() % WINDOW_HEIGHT;
-            int randomEdge = rand() % 4;
-            if (randomEdge == 0)
-                randomX = 0;
-            else if (randomEdge == 1)
-                randomY = 0;
-            else if (randomEdge == 2)
-                randomX = WINDOW_WIDTH;
-            else if (randomEdge == 3)
-                randomY = WINDOW_HEIGHT;
+            int randomEdge = rand()%4;
+            if(randomEdge==0) randomX=0;
+            else if (randomEdge==1) randomY=0;
+            else if (randomEdge==2) randomX=WINDOW_WIDTH;
+            else if (randomEdge==3) randomY=WINDOW_HEIGHT;
 
             pGame->zombieRect[zombieCount].x = randomX;
             pGame->zombieRect[zombieCount].y = randomY;
@@ -157,9 +144,9 @@ void run(Game *pGame)
             lastSpawnTime = currentTime;
         }
         updateSpelare(pGame->pSpelare);
-        updateZombies(pGame->zombieRect, zombieCount); // float playerx/y ska vara spelarens position minus ett litet antal pixlar så att man hinner akta sig för zombies
+        updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
 
-        SDL_RenderClear(pGame->pRenderer);
+        SDL_RenderClear(pGame->pRenderer);        
         SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
         drawSpelare(pGame->pSpelare);
         // Render all zombies
@@ -175,21 +162,16 @@ void run(Game *pGame)
     }
 }
 
+
 // Function to handle input
-void handleInput(SDL_Event *pEvent, Game *pGame, int keys[])
-{
-    if (pEvent->type == SDL_KEYDOWN)
-    {
+void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
+    if (pEvent->type == SDL_KEYDOWN) {
         keys[pEvent->key.keysym.scancode] = 1; // Set the corresponding key state to true
-    }
-    else if (pEvent->type == SDL_KEYUP)
-    {
+    } else if (pEvent->type == SDL_KEYUP) {
         keys[pEvent->key.keysym.scancode] = 0; // Set the corresponding key state to false
     }
 
     // Check for combination of keys pressed together
-<<<<<<< HEAD
-=======
     
     if (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A]){
         moveUp(pGame->pSpelare);
@@ -242,57 +224,5 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[])
         SDL_DestroyRenderer(pGame->pRenderer);
         SDL_DestroyWindow(pGame->pWindow);
         SDL_Quit();
->>>>>>> 97109238b9cadc2d8c6e5d4c9c92e1a73c38d574
 
-    if (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A])
-    {
-        moveUp(pGame->pSpelare);
-        moveLeft(pGame->pSpelare);
     }
-    else if (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_D])
-    {
-        moveUp(pGame->pSpelare);
-        moveRight(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
-    {
-        moveDown(pGame->pSpelare);
-        moveRight(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_A])
-    {
-        moveDown(pGame->pSpelare);
-        moveLeft(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_W])
-    {
-        moveUp(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_A])
-    {
-        moveLeft(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_S])
-    {
-        moveDown(pGame->pSpelare);
-    }
-    else if (keys[SDL_SCANCODE_D])
-    {
-        moveRight(pGame->pSpelare);
-    }
-}
-
-void close(Game *pGame)
-{
-    stopMus();
-    cleanMu();
-    SDL_DestroyTexture(pGame->pSpelareTexture);
-    SDL_FreeSurface(pGame->pSpelareImage);
-    SDL_DestroyTexture(pGame->pbackgroundTexture);
-    SDL_FreeSurface(pGame->pbackgroundImage);
-    SDL_DestroyTexture(pGame->pZombieTexture);
-    SDL_FreeSurface(pGame->pZombieImage);
-    SDL_DestroyRenderer(pGame->pRenderer);
-    SDL_DestroyWindow(pGame->pWindow);
-    SDL_Quit();
-}
