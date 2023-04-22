@@ -7,6 +7,7 @@
 #include "../includes/zombie.h" // include the zombies header file
 #include "../includes/spelare.h"
 #include "../includes/music.h"
+#include "../includes/bullet.h"
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 750
 #define MAX_ZOMBIES 200
@@ -19,9 +20,11 @@ struct game{
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
     SDL_Surface *pZombieImage; 
-    SDL_Texture *pZombieTexture; 
-    SDL_Surface *pSpelareImage;
-    SDL_Texture *pSpelareTexture;
+    SDL_Texture *pZombieTexture;
+    int MoveUp;
+    int MoveLeft;
+    int MoveDown;
+    int MoveRight;
 };
 typedef struct game Game;
 
@@ -88,20 +91,6 @@ int initiate(Game *pGame){
         return 1;
     }
 
-    pGame->pSpelareImage = IMG_Load("resources/soldier2.png");
-    if (!pGame->pSpelareImage)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    pGame->pSpelareTexture = SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->pSpelareImage);
-    if (!pGame->pSpelareTexture)
-    {
-        printf("Error: %s\n", SDL_GetError());
-        return 1;
-    }
-
     pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
@@ -134,6 +123,7 @@ void run(Game *pGame){
                 break;
             }
         }
+
         Uint32 currentTime = SDL_GetTicks();
         if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
         {
@@ -183,7 +173,6 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
 
     // Check for combination of keys pressed together
     
-    
     if (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A]){
         moveUp(pGame->pSpelare);
         moveLeft(pGame->pSpelare);
@@ -198,20 +187,36 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
         moveLeft(pGame->pSpelare);
     } else if (keys[SDL_SCANCODE_W]) {
         moveUp(pGame->pSpelare);
+        pGame->MoveUp=1;
+        pGame->MoveLeft=0;
+        pGame->MoveDown=0;
+        pGame->MoveRight=0;
     } else if (keys[SDL_SCANCODE_A]) {
         moveLeft(pGame->pSpelare);
+        pGame->MoveLeft=1;
+        pGame->MoveUp=0;
+        pGame->MoveDown=0;
+        pGame->MoveRight=0;
     } else if (keys[SDL_SCANCODE_S]) {
         moveDown(pGame->pSpelare);
+        pGame->MoveDown=1;
+        pGame->MoveLeft=0;
+        pGame->MoveUp=0;
+        pGame->MoveRight=0;
     } else if (keys[SDL_SCANCODE_D]) {
         moveRight(pGame->pSpelare);
-}
+        pGame->MoveRight=1;
+        pGame->MoveLeft=0;
+        pGame->MoveDown=0;
+        pGame->MoveUp=0;
+    } else if(keys[SDL_SCANCODE_SPACE]){
+        fireSpelare(pGame->pSpelare, pGame->MoveUp, pGame->MoveLeft, pGame->MoveDown, pGame->MoveRight);
+    }
 }
 
     void close(Game *pGame){
         stopMus();
         cleanMu();
-        SDL_DestroyTexture(pGame->pSpelareTexture);
-        SDL_FreeSurface(pGame->pSpelareImage);
         SDL_DestroyTexture(pGame->pbackgroundTexture);
         SDL_FreeSurface(pGame->pbackgroundImage);
         SDL_DestroyTexture(pGame->pZombieTexture);
