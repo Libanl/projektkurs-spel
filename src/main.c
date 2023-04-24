@@ -4,10 +4,12 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "../includes/zombie.h" // include the zombies header file
 #include "../includes/spelare.h"
 #include "../includes/music.h"
 #include "../includes/bullet.h"
+#include "../includes/text.h"
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 750
 #define MAX_ZOMBIES 200
@@ -25,6 +27,11 @@ struct game{
     int MoveLeft;
     int MoveDown;
     int MoveRight;
+    TTF_Font *pScoreFont, *pFont;
+    Text *pScoreText;
+    int gameTimeM;
+    int startTime;//in ms
+    int gameTime;//in s
 };
 typedef struct game Game;
 
@@ -32,6 +39,9 @@ int initiate(Game *pGame);
 void run(Game *pGame);
 void close(Game *pGame);
 void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
+int getTime(Game *pGame);
+int getMilli(Game *pGame);
+void updateGameTime(Game *pGame);
 
 
 int main(int argv, char** args){
@@ -46,7 +56,18 @@ int main(int argv, char** args){
 
 int initiate(Game *pGame){
 
-     if (initMus() == -1)
+    srand(time(NULL));
+    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER)!=0){
+        printf("Error: %s\n",SDL_GetError());
+        return 0;
+    }
+    if(TTF_Init()!=0){
+        printf("Error: %s\n",TTF_GetError());
+        SDL_Quit();
+        return 0;
+    }
+
+    if (initMus() == -1)
     {
         printf("Kunde inte initiera ljudsystemet!\n");
         return 1;
@@ -91,6 +112,17 @@ int initiate(Game *pGame){
         return 1;
     }
 
+    pGame->pFont = TTF_OpenFont("resources/WOOPPECKER.ttf", 100);
+    pGame->pScoreFont = TTF_OpenFont("resources/WOOPPECKER.ttf", 70);
+    if(!pGame->pFont || !pGame->pScoreFont){
+        printf("Error: %s\n",TTF_GetError());
+        close(pGame);
+        return 0;
+    }
+
+    pGame->startTime = SDL_GetTicks64();
+    pGame->gameTime = -1;
+
     pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
@@ -106,7 +138,7 @@ void run(Game *pGame){
     while (isRunning)
     {   
         //updateSpelare(pGame->pSpelare);
-        
+        updateGameTime(pGame);
         while (SDL_PollEvent(&event))
         {   
             switch (event.type)
@@ -155,10 +187,18 @@ void run(Game *pGame){
             SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
         }
 
-        SDL_RenderPresent(pGame->pRenderer);
+      
 
         // Add delay to slow down the zombies' movement
-        SDL_Delay(10); // add 10 millisecond delay
+         // add 10 millisecond delay
+
+        if(pGame->pScoreText) 
+        {
+            drawText(pGame->pScoreText);
+        }
+        SDL_Delay(1000/60-15);
+
+        SDL_RenderPresent(pGame->pRenderer);
     }
 }
 
@@ -214,15 +254,41 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
     }
 }
 
-    void close(Game *pGame){
-        stopMus();
-        cleanMu();
-        SDL_DestroyTexture(pGame->pbackgroundTexture);
-        SDL_FreeSurface(pGame->pbackgroundImage);
-        SDL_DestroyTexture(pGame->pZombieTexture);
-        SDL_FreeSurface(pGame->pZombieImage);
-        SDL_DestroyRenderer(pGame->pRenderer);
-        SDL_DestroyWindow(pGame->pWindow);
-        SDL_Quit();
+void close(Game *pGame){
+    stopMus();
+    cleanMu();
+    SDL_DestroyTexture(pGame->pbackgroundTexture);
+    SDL_FreeSurface(pGame->pbackgroundImage);
+    SDL_DestroyTexture(pGame->pZombieTexture);
+    SDL_FreeSurface(pGame->pZombieImage);
+    SDL_DestroyRenderer(pGame->pRenderer);
+    SDL_DestroyWindow(pGame->pWindow);
+    SDL_Quit();
 
-    }
+}
+
+int getTime(Game *pGame){
+    return (SDL_GetTicks64()-pGame->startTime)/1000;
+}
+
+int getMilli(Game *pGame)
+{
+    return ((SDL_GetTicks64()-pGame->startTime) % 1000) / 100;
+}
+
+void updateGameTime(Game *pGame){
+
+        if(pGame->pScoreText) 
+        {
+            destroyText(pGame->pScoreText);
+        }
+        static char scoreString[30];
+        sprintf(scoreString,"%d.%d",getTime(pGame), getMilli(pGame));
+        if(pGame->pScoreFont) 
+        {
+            pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
+        }
+    
+}
+
+

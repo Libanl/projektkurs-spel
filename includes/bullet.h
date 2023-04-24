@@ -2,7 +2,7 @@
 #define bullet_h
 
 #define BULLETLIFETIME 300
-#define BULLETVELOCITY 6
+#define BULLETVELOCITY 10
 
 typedef struct bullet Bullet;
 
