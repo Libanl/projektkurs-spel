@@ -24,13 +24,11 @@ void updateZombies(SDL_Rect *zombieRect, int size)
 {
     for (int i = 0; i < size; i++)
     {
-        // Move the zombie rect by a random amount between -5 and 5 pixels horizontally
-        zombieRect[i].x += rand() % 11 - 5;
+        zombieRect[i].x += rand() % 5 - 2;
 
-        // Move the zombie rect by a random amount between -5 and 5 pixels vertically
-        zombieRect[i].y += rand() % 11 - 5;
+        zombieRect[i].y += rand() % 5 - 2;
 
-        // Make sure the zombie rect stays within the screen bounds
+        // zombies lämmnar inte skärm efter dem har spawnat
         if (zombieRect[i].x < 0)
         {
             zombieRect[i].x = 0;
@@ -39,13 +37,35 @@ void updateZombies(SDL_Rect *zombieRect, int size)
         {
             zombieRect[i].y = 0;
         }
-        if (zombieRect[i].x > 800 - zombieRect[i].w)
+        if (zombieRect[i].x > 1000 - zombieRect[i].w)
         {
-            zombieRect[i].x = 800 - zombieRect[i].w;
+            zombieRect[i].x = 1000 - zombieRect[i].w;
         }
-        if (zombieRect[i].y > 600 - zombieRect[i].h)
+        if (zombieRect[i].y > 750 - zombieRect[i].h)
         {
-            zombieRect[i].y = 600 - zombieRect[i].h;
+            zombieRect[i].y = 750 - zombieRect[i].h;
+        }
+
+        // zombies mot mitten av skrämen
+        int center_x = 1000 / 2 - zombieRect[i].w / 2;
+        int center_y = 750 / 2 - zombieRect[i].h / 2;
+
+        if (zombieRect[i].x < center_x)
+        {
+            zombieRect[i].x += 0.75;
+        }
+        else if (zombieRect[i].x > center_x)
+        {
+            zombieRect[i].x -= 0.75;
+        }
+
+        if (zombieRect[i].y < center_y)
+        {
+            zombieRect[i].y += 0.75; // hur fort de rör sig i pixlar
+        }
+        else if (zombieRect[i].y > center_y)
+        {
+            zombieRect[i].y -= 0.75;
         }
     }
 }
