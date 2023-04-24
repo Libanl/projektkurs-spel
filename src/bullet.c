@@ -2,10 +2,16 @@
 #include <SDL2/SDL_image.h>
 #include "../includes/bullet.h"
 
+
+
 struct bullet{
     float x, y, vx, vy;
     int time, window_width, window_height;
     SDL_Texture *pTexture;
+    SDL_Texture *rightTexture;
+    SDL_Texture *downTexture;
+    SDL_Texture *leftTexture;
+    SDL_Texture *UpTexture;
 };
 
 Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_height){
@@ -14,13 +20,22 @@ Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_heigh
     pBullet->window_height = window_height;
     pBullet->time = 0;
     
-    SDL_Surface *pSurface = IMG_Load("resources/bullet.png");
-    if(!pSurface){
+    SDL_Surface *rightSurface = IMG_Load("resources/bullet.png");
+    SDL_Surface *downSurface = IMG_Load("resources/bulletDown.png");
+    SDL_Surface *leftSurface = IMG_Load("resources/bulletleft.png");
+    SDL_Surface *UpSurface = IMG_Load("resources/bulletUp.png");
+    if(!rightSurface|| !downSurface|| !leftSurface || !UpSurface){
         printf("Error: %s\n",SDL_GetError());
         return NULL;
     }
-    pBullet->pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
-    SDL_FreeSurface(pSurface);
+    pBullet->rightTexture = SDL_CreateTextureFromSurface(pRenderer, rightSurface);
+    pBullet->UpTexture = SDL_CreateTextureFromSurface(pRenderer, UpSurface);
+    pBullet->downTexture = SDL_CreateTextureFromSurface(pRenderer, downSurface);
+    pBullet->leftTexture = SDL_CreateTextureFromSurface(pRenderer, leftSurface);
+    SDL_FreeSurface(UpSurface);
+    SDL_FreeSurface(downSurface);
+    SDL_FreeSurface(leftSurface);
+    SDL_FreeSurface(rightSurface);
     return pBullet;
 }
 
@@ -41,8 +56,10 @@ void startBullet(Bullet *pBullet, float x, float y, int moveUp, int moveLeft, in
     // Set horizontal velocity
     if (moveLeft==1) {
         pBullet->vx = -BULLETVELOCITY;
+        pBullet->pTexture = pBullet->leftTexture;
     } else if(moveRight==1) {
         pBullet->vx = BULLETVELOCITY;
+        pBullet->pTexture = pBullet->rightTexture;
     } else {
         pBullet->vx = 0;
     }
@@ -50,8 +67,11 @@ void startBullet(Bullet *pBullet, float x, float y, int moveUp, int moveLeft, in
     // Set vertical velocity
     if (moveUp==1) {
         pBullet->vy = -BULLETVELOCITY;
+        pBullet->pTexture = pBullet->UpTexture;
+
     } else if(moveDown==1) {
         pBullet->vy = BULLETVELOCITY;
+         pBullet->pTexture = pBullet->downTexture;
     } else {
         pBullet->vy = 0;
     }
@@ -76,7 +96,10 @@ float yBullet(Bullet *pBullet){
 }*/
 
 void destroyBullet(Bullet *pBullet){
-    SDL_DestroyTexture(pBullet->pTexture);
+    SDL_DestroyTexture(pBullet->rightTexture);
+    SDL_DestroyTexture(pBullet->UpTexture);
+    SDL_DestroyTexture(pBullet->downTexture);
+    SDL_DestroyTexture(pBullet->leftTexture);
     free(pBullet);
 }
 
