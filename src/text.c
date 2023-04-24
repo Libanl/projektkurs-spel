@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include <SDL2/DL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #include "../includes/text.h"
 
 struct text{
