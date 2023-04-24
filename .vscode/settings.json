@@ -2,9 +2,6 @@
     "files.associations": {
         "spelare.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c",
-        "sdl_ttf.h": "c",
-        "sdl_mixer.h": "c",
-        "text.h": "c"
+        "stdio.h": "c"
     }
 }
