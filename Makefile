@@ -1,5 +1,5 @@
 INCLUDE = C:\msys64\mingw64\include
-LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -mwindows -lm
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf  -mwindows -lm
 
 spelare: main.o zombie.o spelare.o music.o bullet.o
 	gcc -o spelare main.o zombie.o spelare.o music.o bullet.o $(LDFLAGS)
@@ -18,6 +18,9 @@ music.o: ./src/music.c ./includes/music.h
 
 bullet.o: ./src/bullet.c ./includes/bullet.h
 	gcc -c ./src/bullet.c
+
+text.o: ./src/text.c ./includes/text.h
+	gcc -c ./src/text.c
 
 clean:
 	rm *.o
