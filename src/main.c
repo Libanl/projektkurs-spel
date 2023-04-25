@@ -76,7 +76,7 @@ int initiate(Game *pGame){
     playMus("resources/spel.MP3");
 
     pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, 0);
+    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_SOFTWARE);
 
     pGame->pbackgroundImage = IMG_Load("resources/28256.jpg");
     if (!pGame->pbackgroundImage)
@@ -112,8 +112,8 @@ int initiate(Game *pGame){
         return 1;
     }
 
-    pGame->pFont = TTF_OpenFont("resources/WOOPPECKER.ttf", 100);
-    pGame->pScoreFont = TTF_OpenFont("resources/WOOPPECKER.ttf", 70);
+    pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
+    pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
     if(!pGame->pFont || !pGame->pScoreFont){
         printf("Error: %s\n",TTF_GetError());
         close(pGame);
