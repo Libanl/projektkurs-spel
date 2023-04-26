@@ -56,7 +56,7 @@ int main(int argv, char** args){
 
 int initiate(Game *pGame){
 
-    srand(time(NULL));
+    
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER)!=0){
         printf("Error: %s\n",SDL_GetError());
         return 0;
@@ -76,7 +76,7 @@ int initiate(Game *pGame){
     playMus("resources/spel.MP3");
 
     pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_SOFTWARE);
+    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
     pGame->pbackgroundImage = IMG_Load("resources/28256.jpg");
     if (!pGame->pbackgroundImage)
@@ -112,6 +112,11 @@ int initiate(Game *pGame){
         return 1;
     }
 
+    pGame->startTime = SDL_GetTicks64();
+    pGame->gameTime = -1;
+
+    pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
     if(!pGame->pFont || !pGame->pScoreFont){
@@ -119,11 +124,6 @@ int initiate(Game *pGame){
         close(pGame);
         return 0;
     }
-
-    pGame->startTime = SDL_GetTicks64();
-    pGame->gameTime = -1;
-
-    pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 
@@ -138,7 +138,7 @@ void run(Game *pGame){
     while (isRunning)
     {   
         //updateSpelare(pGame->pSpelare);
-        updateGameTime(pGame);
+        
         while (SDL_PollEvent(&event))
         {   
             switch (event.type)
@@ -177,6 +177,7 @@ void run(Game *pGame){
         }
         updateSpelare(pGame->pSpelare);
         updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
+        updateGameTime(pGame);
 
         SDL_RenderClear(pGame->pRenderer);        
         SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
@@ -196,7 +197,7 @@ void run(Game *pGame){
         {
             drawText(pGame->pScoreText);
         }
-        SDL_Delay(1000/60-15);
+        SDL_Delay(10);
 
         SDL_RenderPresent(pGame->pRenderer);
     }
@@ -288,7 +289,6 @@ void updateGameTime(Game *pGame){
         {
             pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
         }
-    
 }
 
 
