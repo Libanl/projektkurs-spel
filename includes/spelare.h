@@ -17,4 +17,5 @@ void moveRight(Spelare *pSpelare);
 void fireSpelare(Spelare *pSpelare, int moveUp, int moveLeft, int moveDown, int moveRight);
 
 
+
 #endif

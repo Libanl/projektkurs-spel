@@ -87,13 +87,13 @@ void drawBullet(Bullet *pBullet,SDL_Renderer *pRenderer){
     SDL_RenderCopy(pRenderer, pBullet->pTexture, NULL, &bulletRect);
 }
 
-/*float xBullet(Bullet *pBullet){
+float xBullet(Bullet *pBullet){
     return pBullet->x;
 }
 
 float yBullet(Bullet *pBullet){
     return pBullet->y;
-}*/
+}
 
 void destroyBullet(Bullet *pBullet){
     SDL_DestroyTexture(pBullet->rightTexture);

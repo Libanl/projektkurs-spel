@@ -106,3 +106,4 @@ void destroySpelare(Spelare *pSpelare)
     SDL_DestroyTexture(pSpelare->pTexture);
     free(pSpelare);
 }
+

@@ -14,10 +14,14 @@
 #define WINDOW_HEIGHT 750
 #define MAX_ZOMBIES 200
 
+enum gameState{START, ONGOING, GAME_OVER};
+typedef enum gameState Gamestate;
+
 struct game{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare;
+    Bullet *pBullet;
     SDL_Rect zombieRect[MAX_ZOMBIES];
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
@@ -28,10 +32,11 @@ struct game{
     int MoveDown;
     int MoveRight;
     TTF_Font *pScoreFont, *pFont;
-    Text *pScoreText;
+    Text *pScoreText, *pOverText, *pStartText;;
     int gameTimeM;
     int startTime;//in ms
     int gameTime;//in s
+    Gamestate state;
 };
 typedef struct game Game;
 
@@ -42,6 +47,7 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
+//void CheckCollison( Game *pGame, int zombieCount);
 
 
 int main(int argv, char** args){
@@ -112,8 +118,11 @@ int initiate(Game *pGame){
         return 1;
     }
 
-    pGame->startTime = SDL_GetTicks64();
-    pGame->gameTime = -1;
+    
+    pGame->MoveUp=1;
+    pGame->MoveLeft=0;
+    pGame->MoveDown=0;
+    pGame->MoveRight=0;
 
     pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -124,6 +133,13 @@ int initiate(Game *pGame){
         close(pGame);
         return 0;
     }
+
+    pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Game over",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
+    pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pScoreFont,"Press space to start",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
+    pGame->startTime = SDL_GetTicks64();
+    pGame->gameTime = -1;
+    pGame->state = START;
+    return 1;
 }
 
 
@@ -137,69 +153,83 @@ void run(Game *pGame){
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
     while (isRunning)
     {   
-        //updateSpelare(pGame->pSpelare);
-        
-        while (SDL_PollEvent(&event))
-        {   
-            switch (event.type)
-            {
-            case SDL_QUIT:
-                isRunning = 0;
-                break;
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
+        switch (pGame->state)
+        {
+            case ONGOING:
+                while (SDL_PollEvent(&event)){   
+                    switch (event.type){
+                    case SDL_QUIT:
+                        isRunning = 0;
+                        break;
+                    case SDL_KEYDOWN:
+                        if (event.key.keysym.sym == SDLK_ESCAPE)
+                        {
+                            isRunning = 0;
+                        }
+                    default: handleInput(&event,pGame,keys);
+                        break;
+                    }
+                }
+
+                Uint32 currentTime = SDL_GetTicks();
+                if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
                 {
+                    // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
+                    int randomX = rand() % WINDOW_WIDTH;
+                    int randomY = rand() % WINDOW_HEIGHT;
+                    int randomEdge = rand()%4;
+                    if(randomEdge==0) randomX=0;
+                    else if (randomEdge==1) randomY=0;
+                    else if (randomEdge==2) randomX=WINDOW_WIDTH;
+                    else if (randomEdge==3) randomY=WINDOW_HEIGHT;
+
+                    pGame->zombieRect[zombieCount].x = randomX;
+                    pGame->zombieRect[zombieCount].y = randomY;
+                    pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 4;
+                    pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 4;
+                    zombieCount++;
+                    lastSpawnTime = currentTime;
+                }
+                updateSpelare(pGame->pSpelare);
+                updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
+                updateGameTime(pGame);
+                SDL_RenderClear(pGame->pRenderer);        
+                SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
+                drawSpelare(pGame->pSpelare);
+                // Render all zombies
+                for (int i = 0; i < zombieCount; i++)
+                {
+                    SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
+                }
+                
+                /*if(aliveBullet(pGame->pBullet)){
+                    CheckCollison(pGame, zombieCount);
+                }*/
+
+                if(pGame->pScoreText) 
+                {
+                    drawText(pGame->pScoreText);
+                }
+                SDL_Delay(10);
+
+                SDL_RenderPresent(pGame->pRenderer);
+                if(getTime(pGame)==10){
                     isRunning = 0;
                 }
-            default: handleInput(&event,pGame,keys);
                 break;
-            }
-        }
-
-        Uint32 currentTime = SDL_GetTicks();
-        if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
-        {
-            // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
-            int randomX = rand() % WINDOW_WIDTH;
-            int randomY = rand() % WINDOW_HEIGHT;
-            int randomEdge = rand()%4;
-            if(randomEdge==0) randomX=0;
-            else if (randomEdge==1) randomY=0;
-            else if (randomEdge==2) randomX=WINDOW_WIDTH;
-            else if (randomEdge==3) randomY=WINDOW_HEIGHT;
-
-            pGame->zombieRect[zombieCount].x = randomX;
-            pGame->zombieRect[zombieCount].y = randomY;
-            pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 4;
-            pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 4;
-            zombieCount++;
-            lastSpawnTime = currentTime;
-        }
-        updateSpelare(pGame->pSpelare);
-        updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
-        updateGameTime(pGame);
-
-        SDL_RenderClear(pGame->pRenderer);        
-        SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
-        drawSpelare(pGame->pSpelare);
-        // Render all zombies
-        for (int i = 0; i < zombieCount; i++)
-        {
-            SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
-        }
-
-      
-
-        // Add delay to slow down the zombies' movement
-         // add 10 millisecond delay
-
-        if(pGame->pScoreText) 
-        {
-            drawText(pGame->pScoreText);
-        }
-        SDL_Delay(10);
-
-        SDL_RenderPresent(pGame->pRenderer);
+            case START:
+                drawText(pGame->pStartText);
+                SDL_RenderPresent(pGame->pRenderer);
+                while(SDL_PollEvent(&event)){
+                    if(event.type==SDL_QUIT) isRunning = 0;
+                    else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_SPACE){
+                        pGame->startTime = SDL_GetTicks64();
+                        pGame->gameTime = -1;
+                        pGame->state = ONGOING;
+                    }
+                }
+                break;
+        }   
     }
 }
 
@@ -264,6 +294,12 @@ void close(Game *pGame){
     SDL_FreeSurface(pGame->pZombieImage);
     SDL_DestroyRenderer(pGame->pRenderer);
     SDL_DestroyWindow(pGame->pWindow);
+    if(pGame->pScoreText) destroyText(pGame->pScoreText);
+    if(pGame->pOverText) destroyText(pGame->pOverText);
+    if(pGame->pStartText) destroyText(pGame->pStartText);   
+    if(pGame->pFont) TTF_CloseFont(pGame->pFont);
+    if(pGame->pScoreFont) TTF_CloseFont(pGame->pScoreFont);
+    TTF_Quit();    
     SDL_Quit();
 
 }
@@ -290,5 +326,17 @@ void updateGameTime(Game *pGame){
             pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
         }
 }
+
+/*void CheckCollison(Game *pGame, int zombieCount)
+{
+    int i;
+    for(i = 0; i < zombieCount; i++){
+        if((xBullet(pGame->pBullet) > pGame->zombieRect[i].x && xBullet(pGame->pBullet) < pGame->zombieRect[i].x + 30) && 
+           (yBullet(pGame->pBullet) > pGame->zombieRect[i].y && yBullet(pGame->pBullet) < pGame->zombieRect[i].y + 30)){
+            printf("test\n");
+            break;
+        }
+    }
+}*/
 
 
