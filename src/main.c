@@ -223,6 +223,7 @@ void run(Game *pGame){
                 while(SDL_PollEvent(&event)){
                     if(event.type==SDL_QUIT) isRunning = 0;
                     else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_SPACE){
+                        resetSpelare(pGame->pSpelare);
                         pGame->startTime = SDL_GetTicks64();
                         pGame->gameTime = -1;
                         pGame->state = ONGOING;
