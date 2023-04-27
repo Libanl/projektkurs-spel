@@ -1,13 +1,17 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "../includes/spelare.h"
+#include "../includes/bullet.h"
 
-struct spelare{
+struct spelare
+{
     float x, y, vx, vy;
     int angle;
     int frame;
     int nyframe;
-    int window_width,window_height;
+    int alive;
+    int window_width, window_height;
+    Bullet *pBullet;
     SDL_Renderer *pRenderer;
     SDL_Texture *pTexture;
     SDL_Rect shipRect[16];
@@ -22,7 +26,7 @@ struct spelare{
     pSpelare->angle=0;
     pSpelare->frame=6;
     pSpelare->nyframe=6;
-
+    pSpelare->pBullet = createBullet(pRenderer, window_width, window_height);
     pSpelare->window_width = window_width;
     pSpelare->window_height = window_height;
     pSpelare->flip = SDL_FLIP_NONE;
@@ -83,6 +87,7 @@ struct spelare{
         pSpelare->y=y-pSpelare->shipRect[i].h;
     }
     return pSpelare;
+    
 }
 
 void moveLeft(Spelare *pSpelare){
@@ -160,13 +165,31 @@ void updateSpelare(Spelare *pSpelare){
     pSpelare->shipRect[pSpelare->frame].x=pSpelare->x;
     pSpelare->shipRect[pSpelare->frame].y=pSpelare->y;
     pSpelare->frame=pSpelare->nyframe;
+    updateBullet(pSpelare->pBullet);
 }
 
-void drawSpelare(Spelare *pSpelare){
+void fireSpelare(Spelare *pSpelare, int m1, int m2, int m3, int m4)
+{
+    if (!pSpelare->alive || aliveBullet(pSpelare->pBullet))
+        return;
+    int moveUp = m1;
+    int moveLeft = m2;
+    int moveDown = m3;
+    int moveRight = m4;
+    startBullet(pSpelare->pBullet, pSpelare->x + pSpelare->shipRect[pSpelare->frame].w / 2, pSpelare->y + pSpelare->shipRect[pSpelare->frame].h / 2, moveUp, moveLeft, moveDown, moveRight);
+}
+
+
+void drawSpelare(Spelare *pSpelare)
+{
+    if (aliveBullet(pSpelare->pBullet))
+        drawBullet(pSpelare->pBullet, pSpelare->pRenderer);
     SDL_RenderCopyEx(pSpelare->pRenderer,pSpelare->pTexture,&(pSpelare->gsprites[pSpelare->frame]),&(pSpelare->shipRect[pSpelare->frame]),pSpelare->angle,NULL,pSpelare->flip);
 }
 
-void destroySpelare(Spelare *pSpelare){
+
+void destroySpelare(Spelare *pSpelare)
+{
     SDL_DestroyTexture(pSpelare->pTexture);
     free(pSpelare);
 }

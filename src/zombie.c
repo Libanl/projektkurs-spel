@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "../includes/zombie.h"
 
-struct zombieImage
+/*struct zombieImage
 {
     SDL_Renderer *pRenderer;
     SDL_Texture *pTexture;
@@ -18,19 +18,17 @@ struct zombie
     SDL_Renderer *pRenderer;
     SDL_Texture *pTexture;
     SDL_Rect rect;
-};
+};*/
 
 void updateZombies(SDL_Rect *zombieRect, int size)
 {
     for (int i = 0; i < size; i++)
     {
-        // Move the zombie rect by a random amount between -5 and 5 pixels horizontally
-        //zombieRect[i].x += rand() % 11 - 5;
+        /*zombieRect[i].x += rand() % 5 - 2;
 
-        // Move the zombie rect by a random amount between -5 and 5 pixels vertically
-        //zombieRect[i].y += rand() % 11 - 5;
+        zombieRect[i].y += rand() % 5 - 2;*/
 
-        // Make sure the zombie rect stays within the screen bounds
+        // zombies lämmnar inte skärm efter dem har spawnat
         if (zombieRect[i].x < 0)
         {
             zombieRect[i].x = 0;
@@ -47,6 +45,28 @@ void updateZombies(SDL_Rect *zombieRect, int size)
         {
             zombieRect[i].y = 750 - zombieRect[i].h;
         }
+
+        // zombies mot mitten av skrämen
+        int center_x = 1000 / 2 - zombieRect[i].w / 2;
+        int center_y = 750 / 2 - zombieRect[i].h / 2;
+
+        if (zombieRect[i].x < center_x)
+        {
+            zombieRect[i].x += 0.75;
+        }
+        else if (zombieRect[i].x > center_x)
+        {
+            zombieRect[i].x -= 0.75;
+        }
+
+        if (zombieRect[i].y < center_y)
+        {
+            zombieRect[i].y += 0.75; // hur fort de rör sig i pixlar
+        }
+        else if (zombieRect[i].y > center_y)
+        {
+            zombieRect[i].y -= 0.75;
+        }
     }
 }
 
@@ -61,7 +81,7 @@ void spawn_zombies(SDL_Rect *zombieRects, int numZombies, SDL_Surface *zombieIma
     }
 }
 
-void move_zombies(SDL_Rect *zombieRects, int numZombies, int movementSpeed, int screenWidth)
+/*void move_zombies(SDL_Rect *zombieRects, int numZombies, int movementSpeed, int screenWidth)
 {
     for (int i = 0; i < numZombies; i++)
     {
@@ -71,7 +91,7 @@ void move_zombies(SDL_Rect *zombieRects, int numZombies, int movementSpeed, int 
             zombieRects[i].x = screenWidth + (zombieRects[i].w / 2);
         }
     }
-}
+}*/
 
 void render_zombies(SDL_Renderer *renderer, SDL_Texture *zombieTexture, SDL_Rect *zombieRects, int numZombies)
 {
@@ -80,7 +100,7 @@ void render_zombies(SDL_Renderer *renderer, SDL_Texture *zombieTexture, SDL_Rect
         SDL_RenderCopy(renderer, zombieTexture, NULL, &zombieRects[i]);
     }
 }
-void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, int screenHeight)
+/*void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, int screenHeight)
 {
     // Seed the random number generator
     srand(time(NULL));
@@ -111,4 +131,4 @@ void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, 
             zombieRect[i].y = screenHeight - zombieRect[i].h;
         }
     }
-}
+}*/
