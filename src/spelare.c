@@ -193,3 +193,8 @@ void destroySpelare(Spelare *pSpelare)
     SDL_DestroyTexture(pSpelare->pTexture);
     free(pSpelare);
 }
+
+void resetSpelare(Spelare *pSpelare){
+    pSpelare->x=pSpelare->window_width/2;
+    pSpelare->y=pSpelare->window_height/2;
+}
