@@ -49,7 +49,7 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
-//void CheckCollison( Game *pGame, int zombieCount);
+void CheckCollison( Game *pGame, int zombieCount);
 
 
 int main(int argv, char** args){
@@ -223,10 +223,9 @@ void run(Game *pGame){
                     SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
                 }
                 
-                /*if(aliveBullet(pGame->pBullet)){
-                    CheckCollison(pGame, zombieCount);
-                }*/
-
+                if(getTime(pGame)>2){ // FUNKTIONEN ANROPAS EFTER 2 SEKUNDER OCH DÅ BLIR DET SEGMENTATION FAULT, 
+                    CheckCollison(pGame, zombieCount); // MOSES! NÅGOT I DENNA FUNKTION GÖR ATT MAN INTE KAN KÖRA 
+                }
                 if(pGame->pScoreText) 
                 {
                     drawText(pGame->pScoreText);
@@ -257,6 +256,7 @@ void run(Game *pGame){
                 while(SDL_PollEvent(&event)){
                     if(event.type==SDL_QUIT) isRunning = 0;
                     else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_SPACE){
+                        resetSpelare(pGame->pSpelare);
                         pGame->startTime = SDL_GetTicks64();
                         pGame->gameTime = -1;
                         pGame->state = ONGOING;
@@ -323,8 +323,14 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
         pGame->MoveUp=0;
     } else if(keys[SDL_SCANCODE_SPACE]){
         fireSpelare(pGame->pSpelare, pGame->MoveUp, pGame->MoveLeft, pGame->MoveDown, pGame->MoveRight);
-    }
+        //for (int i = 0; i < MAX_ZOMBIES; i++) {
+    //if (SDL_IntersectRect(&bulletRect, &zombieRect[i], &intersectionRect)) {
+        
+        //printf("test");
+    //}
 }
+}
+//    }
 
 void close(Game *pGame){
     stopMus();
@@ -370,16 +376,12 @@ void updateGameTime(Game *pGame){
         }
 }
 
-/*void CheckCollison(Game *pGame, int zombieCount)
+void CheckCollison(Game *pGame, int zombieCount)
 {
     int i;
     for(i = 0; i < zombieCount; i++){
         if((xBullet(pGame->pBullet) > pGame->zombieRect[i].x && xBullet(pGame->pBullet) < pGame->zombieRect[i].x + 30) && 
            (yBullet(pGame->pBullet) > pGame->zombieRect[i].y && yBullet(pGame->pBullet) < pGame->zombieRect[i].y + 30)){
-            printf("test\n");
-            break;
+            killBullet(pGame->pBullet);
         }
-    }
-}*/
-
-
+    }   }
