@@ -23,6 +23,8 @@ struct game{
     Spelare *pSpelare;
     Bullet *pBullet;
     SDL_Rect zombieRect[MAX_ZOMBIES];
+    SDL_Surface *pGame_StartBackgroundimage;
+    SDL_Texture *pGame_StartbackgroundTexture;
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
     SDL_Surface *pZombieImage; 
@@ -31,7 +33,7 @@ struct game{
     int MoveLeft;
     int MoveDown;
     int MoveRight;
-    TTF_Font *pScoreFont, *pFont;
+    TTF_Font *pScoreFont, *pFont,*pOverFont;
     Text *pScoreText, *pOverText, *pStartText;;
     int gameTimeM;
     int startTime;//in ms
@@ -84,6 +86,23 @@ int initiate(Game *pGame){
     pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
+    pGame->pGame_StartBackgroundimage = IMG_Load("resources/iFiO8.png");
+    if (!pGame->pGame_StartBackgroundimage)
+    {
+        printf("Error! backgroundImage failed\n", IMG_GetError());
+        return 1;
+    }
+
+    pGame->pGame_StartbackgroundTexture = SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->pGame_StartBackgroundimage);
+    if (!pGame->pGame_StartbackgroundTexture)
+    {
+        printf("Failed to create background texture: %s\n", SDL_GetError());
+        SDL_FreeSurface(pGame->pGame_StartBackgroundimage);
+        return 1;
+    }
+
+    
+
     pGame->pbackgroundImage = IMG_Load("resources/28256.jpg");
     if (!pGame->pbackgroundImage)
     {
@@ -128,6 +147,7 @@ int initiate(Game *pGame){
 
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
+    pGame->pOverFont = TTF_OpenFont("resources/arial.ttf", 40);
     if(!pGame->pFont || !pGame->pScoreFont){
         printf("Error: %s\n",TTF_GetError());
         close(pGame);
@@ -135,7 +155,7 @@ int initiate(Game *pGame){
     }
 
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Game over",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
-    pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pScoreFont,"Press space to start",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
+    pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pOverFont,"Press space to start OR M (TO GO BACK TO MENU)",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
     pGame->startTime = SDL_GetTicks64();
     pGame->gameTime = -1;
     pGame->state = START;
@@ -148,6 +168,7 @@ void run(Game *pGame){
     
     int keys[SDL_NUM_SCANCODES] = {0}; // Initialize an array to store key states
     int isRunning = 1;
+    int first=1;
     SDL_Event event;
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
@@ -214,11 +235,24 @@ void run(Game *pGame){
 
                 SDL_RenderPresent(pGame->pRenderer);
                 if(getTime(pGame)==10){
-                    isRunning = 0;
+                    pGame->state= GAME_OVER;
                 }
                 break;
-            case START:
+                case GAME_OVER:
+                drawText(pGame->pOverText);
                 drawText(pGame->pStartText);
+                resetSpelare(pGame->pSpelare);
+                zombieCount=0;
+                pGame->MoveLeft=0;
+                pGame->MoveUp=0;
+                 pGame->MoveRight=0;
+                pGame->MoveDown=1;
+            case START:
+            if(first==1)
+            {
+                SDL_RenderCopy(pGame->pRenderer,pGame->pGame_StartbackgroundTexture, NULL,NULL);
+                first++;
+            }
                 SDL_RenderPresent(pGame->pRenderer);
                 while(SDL_PollEvent(&event)){
                     if(event.type==SDL_QUIT) isRunning = 0;
@@ -227,7 +261,14 @@ void run(Game *pGame){
                         pGame->gameTime = -1;
                         pGame->state = ONGOING;
                     }
+                    else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_M)
+                    {
+                        first=1;
+                        pGame->state=START;
+                    }
+                    
                 }
+
                 break;
         }   
     }
@@ -288,6 +329,8 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
 void close(Game *pGame){
     stopMus();
     cleanMu();
+    SDL_DestroyTexture(pGame->pGame_StartbackgroundTexture);
+    SDL_FreeSurface(pGame->pGame_StartBackgroundimage);
     SDL_DestroyTexture(pGame->pbackgroundTexture);
     SDL_FreeSurface(pGame->pbackgroundImage);
     SDL_DestroyTexture(pGame->pZombieTexture);
