@@ -5,17 +5,16 @@
 #include <stdlib.h>
 #include "../includes/zombie.h"
 
-typedef struct {
+typedef struct
+{
     int x;
     int y;
 } Target;
 
-
-
 void updateZombies(SDL_Rect *zombieRect, int size)
 {
     static Target targets[40] = {0};
-    
+
     for (int i = 0; i < size; i++)
     {
         if (zombieRect[i].x < 0)
@@ -115,15 +114,14 @@ void spawn_zombies(SDL_Rect *zombieRects, int numZombies, SDL_Surface *zombieIma
 {
     {
         for (int i = 0; i < numZombies; i++)
-            {
+        {
             zombieRects[i].x = screenWidth + i * (zombieImage->w / 2); // spawn zombies off-screen
             zombieRects[i].y = screenHeight - (zombieImage->h / 2);
             zombieRects[i].w = zombieImage->w / 2;
             zombieRects[i].h = zombieImage->h / 2;
-            }
+        }
     }
 }
-
 
 void render_zombies(SDL_Renderer *renderer, SDL_Texture *zombieTexture, SDL_Rect *zombieRects, int numZombies)
 {
