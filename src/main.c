@@ -243,10 +243,7 @@ void run(Game *pGame){
                 drawText(pGame->pStartText);
                 resetSpelare(pGame->pSpelare);
                 zombieCount=0;
-                pGame->MoveLeft=0;
-                pGame->MoveUp=0;
-                 pGame->MoveRight=0;
-                pGame->MoveDown=1;
+                pressed=0;
             case START:
             if(first==1)
             {
@@ -255,8 +252,20 @@ void run(Game *pGame){
             }
                 SDL_RenderPresent(pGame->pRenderer);
                 while(SDL_PollEvent(&event)){
-                    if(event.type==SDL_QUIT) isRunning = 0;
-                    else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_SPACE){
+                    if(event.type==SDL_QUIT)
+                    { 
+                        isRunning = 0;
+                    }
+                    if(SDL_MOUSEMOTION==event.type)
+                    {
+                        int XPos,YPos;
+                        pGame->mouseState = SDL_GetMouseState(&XPos, &YPos);
+                    }
+                    if(SDL_MOUSEBUTTONDOWN == event.type)
+                    {
+                        pressed=1;
+                    }
+                    else if(pressed==1){
                         pGame->startTime = SDL_GetTicks64();
                         pGame->gameTime = -1;
                         pGame->state = ONGOING;
@@ -265,6 +274,12 @@ void run(Game *pGame){
                     {
                         first=1;
                         pGame->state=START;
+                    }
+                    else if(event.type==SDL_KEYDOWN && event.key.keysym.scancode==SDL_SCANCODE_SPACE)
+                    {
+                        pGame->state= ONGOING;
+                        pGame->startTime = SDL_GetTicks64();
+                        pGame->gameTime=-1;
                     }
                     
                 }
