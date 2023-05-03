@@ -232,11 +232,6 @@ void run(Game *pGame)
             SDL_RenderClear(pGame->pRenderer);
             SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
             drawSpelare(pGame->pSpelare);
-            // Render all zombies
-            /*for (int i = 0; i < zombieCount; i++)
-            {
-                SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
-            }*/
             render_zombies(pGame->pRenderer, pGame->pZombieTexture, pGame->zombieRect, zombieCount);
 
             /*if(aliveBullet(pGame->pBullet)){
