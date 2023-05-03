@@ -5,30 +5,19 @@
 #include <stdlib.h>
 #include "../includes/zombie.h"
 
-struct zombieImage
-{
-    SDL_Renderer *pRenderer;
-    SDL_Texture *pTexture;
-};
+typedef struct {
+    int x;
+    int y;
+} Target;
 
-struct zombie
-{
-    float x, y, vx, vy;
-    int window_width, window_height, renderAngle;
-    SDL_Renderer *pRenderer;
-    SDL_Texture *pTexture;
-    SDL_Rect rect;
-};
+
 
 void updateZombies(SDL_Rect *zombieRect, int size)
 {
+    static Target targets[40] = {0};
+    
     for (int i = 0; i < size; i++)
     {
-        zombieRect[i].x += rand() % 5 - 2;
-
-        zombieRect[i].y += rand() % 5 - 2;
-
-        // zombies lämmnar inte skärm efter dem har spawnat
         if (zombieRect[i].x < 0)
         {
             zombieRect[i].x = 0;
@@ -46,89 +35,100 @@ void updateZombies(SDL_Rect *zombieRect, int size)
             zombieRect[i].y = 750 - zombieRect[i].h;
         }
 
-        // zombies mot mitten av skrämen
-        int center_x = 1000 / 2 - zombieRect[i].w / 2;
-        int center_y = 750 / 2 - zombieRect[i].h / 2;
-
-        if (zombieRect[i].x < center_x)
+        // if zombie has reached current target point, select new random target point
+        if (targets[i].x == 0 && targets[i].y == 0)
         {
-            zombieRect[i].x += 0.75;
-        }
-        else if (zombieRect[i].x > center_x)
-        {
-            zombieRect[i].x -= 0.75;
+            targets[i].x = rand() % 1000;
+            targets[i].y = rand() % 750;
         }
 
-        if (zombieRect[i].y < center_y)
+        // calculate distance to current target point
+        int dx = targets[i].x - zombieRect[i].x;
+        int dy = targets[i].y - zombieRect[i].y;
+        int distance = sqrt(dx * dx + dy * dy);
+
+        // update zombie position towards target point
+        if (distance > 10)
         {
-            zombieRect[i].y += 0.75; // hur fort de rör sig i pixlar
+            int angle = atan2(dy, dx);
+            zombieRect[i].x += 2 * cos(angle);
+            zombieRect[i].y += 2 * sin(angle);
         }
-        else if (zombieRect[i].y > center_y)
+        else
         {
-            zombieRect[i].y -= 0.75;
+            targets[i].x = 0;
+            targets[i].y = 0;
         }
     }
+    /*
+     static int targetX = -1;  // current target point
+    static int targetY = -1;
+
+    for (int i = 0; i < size; i++)
+    {
+        if (zombieRect[i].x < 0)
+        {
+            zombieRect[i].x = 0;
+        }
+        if (zombieRect[i].y < 0)
+        {
+            zombieRect[i].y = 0;
+        }
+        if (zombieRect[i].x > 1000 - zombieRect[i].w)
+        {
+            zombieRect[i].x = 1000 - zombieRect[i].w;
+        }
+        if (zombieRect[i].y > 750 - zombieRect[i].h)
+        {
+            zombieRect[i].y = 750 - zombieRect[i].h;
+        }
+
+        // if zombie has reached current target point, select new random target point
+        if (targetX == -1 && targetY == -1)
+        {
+            targetX = rand() % 1000;
+            targetY = rand() % 750;
+        }
+
+        // calculate distance to current target point
+        int dx = targetX - zombieRect[i].x;
+        int dy = targetY - zombieRect[i].y;
+        int distance = sqrt(dx * dx + dy * dy);
+
+        // update zombie position towards target point
+        if (distance > 10)
+        {
+            int angle = atan2(dy, dx);
+            zombieRect[i].x += 2 * cos(angle);
+            zombieRect[i].y += 2 * sin(angle);
+        }
+        else
+        {
+            targetX = -1;
+            targetY = -1;
+        }
+    }
+    */
 }
 
 void spawn_zombies(SDL_Rect *zombieRects, int numZombies, SDL_Surface *zombieImage, SDL_Texture *zombieTexture, int screenWidth, int screenHeight)
 {
-    for (int i = 0; i < numZombies; i++)
     {
-        zombieRects[i].x = screenWidth + i * (zombieImage->w / 2); // spawn zombies off-screen
-        zombieRects[i].y = screenHeight - (zombieImage->h / 2);
-        zombieRects[i].w = zombieImage->w / 2;
-        zombieRects[i].h = zombieImage->h / 2;
+        for (int i = 0; i < numZombies; i++)
+            {
+            zombieRects[i].x = screenWidth + i * (zombieImage->w / 2); // spawn zombies off-screen
+            zombieRects[i].y = screenHeight - (zombieImage->h / 2);
+            zombieRects[i].w = zombieImage->w / 2;
+            zombieRects[i].h = zombieImage->h / 2;
+            }
     }
 }
 
-void move_zombies(SDL_Rect *zombieRects, int numZombies, int movementSpeed, int screenWidth)
-{
-    for (int i = 0; i < numZombies; i++)
-    {
-        zombieRects[i].x -= movementSpeed;
-        if (zombieRects[i].x < -zombieRects[i].w)
-        {
-            zombieRects[i].x = screenWidth + (zombieRects[i].w / 2);
-        }
-    }
-}
 
 void render_zombies(SDL_Renderer *renderer, SDL_Texture *zombieTexture, SDL_Rect *zombieRects, int numZombies)
 {
     for (int i = 0; i < numZombies; i++)
     {
         SDL_RenderCopy(renderer, zombieTexture, NULL, &zombieRects[i]);
-    }
-}
-void moveZombiesRandomly(SDL_Rect *zombieRect, int numZombies, int screenWidth, int screenHeight)
-{
-    // Seed the random number generator
-    srand(time(NULL));
-
-    for (int i = 0; i < numZombies; i++)
-    {
-        // Move the zombie randomly
-        int randomX = rand() % 3 - 1; // generate a random number between -1 and 1
-        int randomY = rand() % 3 - 1;
-        zombieRect[i].x += randomX;
-        zombieRect[i].y += randomY;
-
-        // Keep the zombie within the screen boundaries
-        if (zombieRect[i].x < 0)
-        {
-            zombieRect[i].x = 0;
-        }
-        else if (zombieRect[i].x > screenWidth - zombieRect[i].w)
-        {
-            zombieRect[i].x = screenWidth - zombieRect[i].w;
-        }
-        if (zombieRect[i].y < 0)
-        {
-            zombieRect[i].y = 0;
-        }
-        else if (zombieRect[i].y > screenHeight - zombieRect[i].h)
-        {
-            zombieRect[i].y = screenHeight - zombieRect[i].h;
-        }
     }
 }
