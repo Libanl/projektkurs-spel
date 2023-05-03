@@ -33,6 +33,7 @@ struct game{
     int MoveLeft;
     int MoveDown;
     int MoveRight;
+    int mouseState;
     TTF_Font *pScoreFont, *pFont,*pOverFont;
     Text *pScoreText, *pOverText, *pStartText;;
     int gameTimeM;
@@ -169,6 +170,7 @@ void run(Game *pGame){
     int keys[SDL_NUM_SCANCODES] = {0}; // Initialize an array to store key states
     int isRunning = 1;
     int first=1;
+    int pressed;
     SDL_Event event;
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
@@ -396,5 +398,3 @@ void updateGameTime(Game *pGame){
         }
     }
 }*/
-
-
