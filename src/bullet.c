@@ -6,12 +6,17 @@
 
 struct bullet{
     float x, y, vx, vy;
-    int time, window_width, window_height;
+    int time, window_width, window_height, ifalive;
     SDL_Texture *pTexture;
     SDL_Texture *rightTexture;
     SDL_Texture *downTexture;
     SDL_Texture *leftTexture;
     SDL_Texture *UpTexture;
+    SDL_Rect rect;
+    /*float *recX;
+    float *recY;
+    int *recW;
+    int *recH;*/
 };
 
 Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_height){
@@ -19,6 +24,11 @@ Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_heigh
     pBullet->window_width = window_width;
     pBullet->window_height = window_height;
     pBullet->time = 0;
+
+    pBullet->rect.w = 16;
+    pBullet->rect.h = 16;
+    /*pBullet->rect.x = pBullet->x;
+    pBullet->rect.y = pBullet->y;*/
     
     SDL_Surface *rightSurface = IMG_Load("resources/bullet.png");
     SDL_Surface *downSurface = IMG_Load("resources/bulletDown.png");
@@ -43,12 +53,17 @@ void updateBullet(Bullet *pBullet){
     if(pBullet->time==0) return;
     pBullet->x+=pBullet->vx;
     pBullet->y+=pBullet->vy;
+
+    pBullet->rect.x = pBullet->x;
+    pBullet->rect.y = pBullet->y;
+    
     if(pBullet->x<0 || pBullet->x>pBullet->window_width || pBullet->y<0 || pBullet->y>pBullet->window_height ) killBullet(pBullet);
     (pBullet->time)--;
     return;
 }
 
 void startBullet(Bullet *pBullet, float x, float y, int moveUp, int moveLeft, int moveDown, int moveRight ) {
+    pBullet->ifalive=1;
     pBullet->x = x;
     pBullet->y = y;
     pBullet->time = BULLETLIFETIME;
@@ -81,21 +96,41 @@ void killBullet(Bullet *pBullet){
     pBullet->time=0;
 }
 
-void drawBullet(Bullet *pBullet,SDL_Renderer *pRenderer){
+void drawBullet(Bullet *pBullet, SDL_Renderer *pRenderer){
    if(pBullet->time==0) return;
-    SDL_Rect bulletRect = {pBullet->x, pBullet->y, 16, 16}; // Replace 16 with your texture width and height
-    SDL_RenderCopy(pRenderer, pBullet->pTexture, NULL, &bulletRect);
+    //SDL_rect pBullet->rect = {pBullet->x, pBullet->y, 16, 16}; // Replace 16 with your texture width and height
+    pBullet->rect.x = pBullet->x;
+    pBullet->rect.y = pBullet->y;
+    pBullet->rect.w = 16;
+    pBullet->rect.h = 16;
+    
+    /*pBullet->recX = pBullet->x;
+    pBullet->recY = pBullet->y;
+    pBullet->recW = 16;
+    pBullet->recH = 16;*/
+
+    SDL_RenderCopy(pRenderer, pBullet->pTexture, NULL, &(pBullet->rect));
 }
 
-float xBullet(Bullet *pBullet){
-    return pBullet->x;
+int xBullet(Bullet *pBullet){
+    return pBullet->rect.x;
 }
 
-float yBullet(Bullet *pBullet){
-    return pBullet->y;
+int yBullet(Bullet *pBullet){
+    return pBullet->rect.y;
+}
+
+int wBullet(Bullet *pBullet){
+    return pBullet->rect.w;
+}
+
+int hBullet(Bullet *pBullet)
+{
+    return pBullet->rect.h;
 }
 
 void destroyBullet(Bullet *pBullet){
+    pBullet->ifalive=0;
     SDL_DestroyTexture(pBullet->rightTexture);
     SDL_DestroyTexture(pBullet->UpTexture);
     SDL_DestroyTexture(pBullet->downTexture);
@@ -105,4 +140,14 @@ void destroyBullet(Bullet *pBullet){
 
 int aliveBullet(Bullet *pBullet){
     return pBullet->time>0;
+}
+
+int checkBulletlife(Bullet *pBullet)
+{
+    return pBullet->ifalive;
+}
+
+SDL_Rect getRectBullet(Bullet *pBullet){
+    //printf("%d", pBullet->rect.x);
+    return pBullet->rect;
 }

@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 #include "../includes/spelare.h"
 #include "../includes/bullet.h"
 
@@ -10,6 +10,7 @@ struct spelare
     int frame;
     int nyframe;
     int alive;
+    int bulletAlive;
     int window_width, window_height;
     Bullet *pBullet;
     SDL_Renderer *pRenderer;
@@ -180,11 +181,15 @@ void fireSpelare(Spelare *pSpelare, int m1, int m2, int m3, int m4)
 }
 
 
-void drawSpelare(Spelare *pSpelare)
+int drawSpelare(Spelare *pSpelare)
 {
-    if (aliveBullet(pSpelare->pBullet))
-        drawBullet(pSpelare->pBullet, pSpelare->pRenderer);
     SDL_RenderCopyEx(pSpelare->pRenderer,pSpelare->pTexture,&(pSpelare->gsprites[pSpelare->frame]),&(pSpelare->shipRect[pSpelare->frame]),pSpelare->angle,NULL,pSpelare->flip);
+    if (aliveBullet(pSpelare->pBullet)){
+        drawBullet(pSpelare->pBullet, pSpelare->pRenderer);
+        pSpelare->bulletAlive=1;
+        return pSpelare->bulletAlive;
+    }
+    return -1;
 }
 
 
