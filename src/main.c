@@ -21,14 +21,19 @@ struct game{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare;
+    Zombie *pZombie;
     Bullet *pBullet;
     SDL_Rect zombieRect[MAX_ZOMBIES];
+    ZombieImage *pZombieImage;
+    Zombie *pZombies[100];
     SDL_Surface *pGame_StartBackgroundimage;
     SDL_Texture *pGame_StartbackgroundTexture;
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
-    SDL_Surface *pZombieImage; 
-    SDL_Texture *pZombieTexture;
+    int Nrofzombies;
+    int timeForNextZombie;
+    //SDL_Surface *pZombieImage; 
+   // SDL_Texture *pZombieTexture;
     int MoveUp;
     int MoveLeft;
     int MoveDown;
@@ -50,6 +55,8 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
+void updateNrOfZombies(Game *pGame);
+
 //void CheckCollison( Game *pGame, int zombieCount);
 
 
@@ -119,7 +126,7 @@ int initiate(Game *pGame){
         return 1;
     }
 
-    pGame->pZombieImage = IMG_Load("resources/zombie.png");
+    /*pGame->pZombieImage = IMG_Load("resources/zombie.png");
     if (!pGame->pZombieImage)
     {
         printf("Error! ZombieImage failed\n", IMG_GetError());
@@ -137,6 +144,7 @@ int initiate(Game *pGame){
         SDL_FreeSurface(pGame->pbackgroundImage);
         return 1;
     }
+    */
 
     
     pGame->MoveUp=1;
@@ -145,6 +153,8 @@ int initiate(Game *pGame){
     pGame->MoveRight=0;
 
     pGame->pSpelare = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    //pGame->pZombie =  createZombie(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
+     pGame->pZombieImage = initiateZombie(pGame->pRenderer);
 
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
@@ -154,6 +164,10 @@ int initiate(Game *pGame){
         close(pGame);
         return 0;
     }
+
+    pGame->Nrofzombies=0;
+    pGame->timeForNextZombie=3;
+   
 
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Game over",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pOverFont,"Press space to start OR M (TO GO BACK TO MENU)",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
@@ -170,7 +184,8 @@ void run(Game *pGame){
     int keys[SDL_NUM_SCANCODES] = {0}; // Initialize an array to store key states
     int isRunning = 1;
     int first=1;
-    int pressed;
+    int pressed=0;
+    int j=0;
     SDL_Event event;
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
@@ -195,36 +210,25 @@ void run(Game *pGame){
                 }
 
                 Uint32 currentTime = SDL_GetTicks();
-                if (currentTime - lastSpawnTime >= 1000 && zombieCount < MAX_ZOMBIES)
-                {
-                    // Spawn a new zombie at a random location //funkar inte när man gör till funktion????
-                    int randomX = rand() % WINDOW_WIDTH;
-                    int randomY = rand() % WINDOW_HEIGHT;
-                    int randomEdge = rand()%4;
-                    if(randomEdge==0) randomX=0;
-                    else if (randomEdge==1) randomY=0;
-                    else if (randomEdge==2) randomX=WINDOW_WIDTH;
-                    else if (randomEdge==3) randomY=WINDOW_HEIGHT;
-
-                    pGame->zombieRect[zombieCount].x = randomX;
-                    pGame->zombieRect[zombieCount].y = randomY;
-                    pGame->zombieRect[zombieCount].w = pGame->pZombieImage->w / 4;
-                    pGame->zombieRect[zombieCount].h = pGame->pZombieImage->h / 4;
-                    zombieCount++;
-                    lastSpawnTime = currentTime;
-                }
+                updateNrOfZombies(pGame);
                 updateSpelare(pGame->pSpelare);
-                updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
+                
+                
+                //updateZombies(pGame->zombieRect, zombieCount); // update the zombies' positions
                 updateGameTime(pGame);
                 SDL_RenderClear(pGame->pRenderer);        
                 SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
-                drawSpelare(pGame->pSpelare);
-                // Render all zombies
-                for (int i = 0; i < zombieCount; i++)
+                for(int i=0;i<(pGame->Nrofzombies);i++) 
                 {
-                    SDL_RenderCopy(pGame->pRenderer, pGame->pZombieTexture, NULL, &pGame->zombieRect[i]);
+                    updateZombie(pGame->pZombies[i]);
                 }
-                
+                drawSpelare(pGame->pSpelare);
+                for(int i=0;i<pGame->Nrofzombies;i++)
+                {
+                    drawZombie(pGame->pZombies[i]);
+                }
+                //drawZombies(pGame->pZombie);
+                // Render all zombies
                 /*if(aliveBullet(pGame->pBullet)){
                     CheckCollison(pGame, zombieCount);
                 }*/
@@ -236,7 +240,7 @@ void run(Game *pGame){
                 SDL_Delay(10);
 
                 SDL_RenderPresent(pGame->pRenderer);
-                if(getTime(pGame)==10){
+                if(getTime(pGame)==100){
                     pGame->state= GAME_OVER;
                 }
                 break;
@@ -244,7 +248,7 @@ void run(Game *pGame){
                 drawText(pGame->pOverText);
                 drawText(pGame->pStartText);
                 resetSpelare(pGame->pSpelare);
-                zombieCount=0;
+                pGame->Nrofzombies=0;
                 pressed=0;
             case START:
             if(first==1)
@@ -350,8 +354,8 @@ void close(Game *pGame){
     SDL_FreeSurface(pGame->pGame_StartBackgroundimage);
     SDL_DestroyTexture(pGame->pbackgroundTexture);
     SDL_FreeSurface(pGame->pbackgroundImage);
-    SDL_DestroyTexture(pGame->pZombieTexture);
-    SDL_FreeSurface(pGame->pZombieImage);
+    //SDL_DestroyTexture(pGame->pZombieTexture);
+    //SDL_FreeSurface(pGame->pZombieImage);
     SDL_DestroyRenderer(pGame->pRenderer);
     SDL_DestroyWindow(pGame->pWindow);
     if(pGame->pScoreText) destroyText(pGame->pScoreText);
@@ -386,6 +390,18 @@ void updateGameTime(Game *pGame){
             pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
         }
 }
+
+
+void updateNrOfZombies(Game *pGame){
+    if(getTime(pGame)>pGame->timeForNextZombie&& pGame->Nrofzombies<100){
+        (pGame->timeForNextZombie)=(pGame->timeForNextZombie)+1;//seconds till next asteroid
+        pGame->pZombies[pGame->Nrofzombies] = createZombie(pGame->pZombieImage,WINDOW_WIDTH,WINDOW_HEIGHT);
+        pGame->Nrofzombies++; 
+    }    
+     
+}
+
+
 
 /*void CheckCollison(Game *pGame, int zombieCount)
 {
