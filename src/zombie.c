@@ -128,10 +128,16 @@ void drawZombie(Zombie *pZombie)
     SDL_RenderCopyEx(pZombie->pRenderer, pZombie->pTexture, NULL, &(pZombie->rect), pZombie->renderAngle, NULL, SDL_FLIP_NONE);
 }
 
-SDL_Rect getRectZombie( Zombie *pZombie)
+SDL_Rect getRectZombie(Zombie *pZombie)
 {
     return pZombie->rect;
 }
+
+void destroyZombie(Zombie *pZombie)
+{
+    free(pZombie);
+}
+
 /*Zombie *createZombie(int x, int y, SDL_Renderer *pRenderer, int window_width, int window_height)
 {
     Zombie *pZombie= malloc(sizeof(struct zombie));

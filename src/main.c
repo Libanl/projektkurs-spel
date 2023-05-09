@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include "../includes/zombie.h" // include the zombies header file
+#include "../includes/zombie.h" // include the zombies header file                   //game over funkar konstigt det blir seg.fault efter //collision detection funkar men inte riktigt som den ska
 #include "../includes/spelare.h"
 #include "../includes/music.h"
 #include "../includes/bullet.h"
@@ -48,7 +48,6 @@ struct game
     int mouseState;
     TTF_Font *pScoreFont, *pFont, *pOverFont;
     Text *pScoreText, *pOverText, *pStartText;
-    ;
     int gameTimeM;
     int startTime; // in ms
     int gameTime;  // in s
@@ -64,7 +63,7 @@ int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
 void updateNrOfZombies(Game *pGame);
-bool DoBoxesIntersect(SDL_Rect *a, SDL_Rect *b);
+void resetZombies(Game *pGame);
 
 int main(int argv, char **args)
 {
@@ -173,6 +172,7 @@ int initiate(Game *pGame)
     }
 
     pGame->Nrofzombies = 0;
+    resetZombies(pGame);
     pGame->timeForNextZombie = 3;
 
     pGame->pOverText = createText(pGame->pRenderer, 238, 168, 65, pGame->pFont, "Game over", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -253,15 +253,15 @@ void run(Game *pGame)
             {
                 updateZombie(pGame->pZombies[i]);
             }
-            for (int i = 0; i < pGame->Nrofzombies; i++)
-            {
-                if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
-                    pGame->state = GAME_OVER;
-            }
             drawSpelare(pGame->pSpelare);
             for (int i = 0; i < pGame->Nrofzombies; i++)
             {
                 drawZombie(pGame->pZombies[i]);
+            }
+            for (int i = 0; i < pGame->Nrofzombies; i++)
+            {
+                if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
+                    pGame->state = GAME_OVER;
             }
             if (pGame->pScoreText)
             {
@@ -275,10 +275,11 @@ void run(Game *pGame)
             }
 
             endTime = SDL_GetTicks();
-            if (endTime - startTime < frameTime)
+            SDL_Delay(10);
+            /*if (endTime - startTime < frameTime)
             {
                 SDL_Delay(frameTime - (endTime - startTime));
-            }
+            }*/
 
             break;
         case GAME_OVER:
@@ -458,12 +459,25 @@ void updateGameTime(Game *pGame)
 
 void updateNrOfZombies(Game *pGame)
 {
-    if (getTime(pGame) > pGame->timeForNextZombie && pGame->Nrofzombies < 100)
+    if (getTime(pGame) > pGame->timeForNextZombie && pGame->Nrofzombies < MAX_ZOMBIES)
     {
         (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
         pGame->pZombies[pGame->Nrofzombies] = createZombie(pGame->pZombieImage, WINDOW_WIDTH, WINDOW_HEIGHT);
         pGame->Nrofzombies++;
     }
+}
+
+void resetZombies(Game *pGame)
+{
+    for (int i = 0; i < pGame->Nrofzombies; i++)
+    {
+        destroyZombie(pGame->pZombies[i]);
+    }
+    pGame->Nrofzombies = 0;
+    /*for (int i = 0; i < pGame->nrOfAsteroids; i++)
+    {
+        pGame->pAsteroids[i] = createAsteroid(pGame->pAsteroidImage, WINDOW_WIDTH, WINDOW_HEIGHT);
+    }*/
 }
 
 /*void CheckCollison(Game *pGame, int zombieCount)

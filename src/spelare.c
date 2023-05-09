@@ -83,8 +83,8 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     for (int i = 0; i < 7; i++)
     {
         pSpelare->shipRect[i] = pSpelare->gsprites[i];
-        pSpelare->shipRect[i].w = pSpelare->shipRect[i].w / 2;
-        pSpelare->shipRect[i].h = pSpelare->shipRect[i].h / 2;
+        pSpelare->shipRect[i].w = pSpelare->shipRect[i].w / 1.5;
+        pSpelare->shipRect[i].h = pSpelare->shipRect[i].h / 1.5;
         pSpelare->x = x - pSpelare->shipRect[i].w;
         pSpelare->y = y - pSpelare->shipRect[i].h;
     }
@@ -213,7 +213,7 @@ void resetSpelare(Spelare *pSpelare)
 
 int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
 {
-    return distance(pSpelare->shipRect->x + pSpelare->shipRect->w / 2, pSpelare->shipRect->y + pSpelare->shipRect->h / 2, rect.x + rect.w / 3, rect.y + rect.h / 2) < (pSpelare->shipRect->w + rect.w) / 2;
+    return distance(pSpelare->shipRect->x + pSpelare->shipRect->w / 2, pSpelare->shipRect->y + pSpelare->shipRect->h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pSpelare->shipRect->w + rect.w) / 2;
 }
 
 float distance(int x1, int y1, int x2, int y2)

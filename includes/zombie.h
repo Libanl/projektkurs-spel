@@ -13,6 +13,7 @@ Zombie *createZombie(ZombieImage *pZombieImage, int window_width, int window_hei
 void updateZombie(Zombie *pZombie);
 void drawZombie(Zombie *pZombie);
 SDL_Rect getRectZombie(Zombie *pZombie);
+void destroyZombie(Zombie *pZombie);
 
 /*
 void spawn_zombies(SDL_Rect *zombieRects, int numZombies, SDL_Surface *zombieImage, SDL_Texture *zombieTexture, int screenWidth, int screenHeight);
