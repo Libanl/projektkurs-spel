@@ -205,3 +205,4 @@ void resetSpelare(Spelare *pSpelare)
     pSpelare->vx = pSpelare->vy = 0;
     pSpelare->nyframe = 6;
 }
+
