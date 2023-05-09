@@ -213,6 +213,29 @@ void run(Game *pGame)
                     {
                         isRunning = 0;
                     }
+                    else
+                    {
+                        switch (event.key.keysym.scancode)
+                        {
+                        case SDL_SCANCODE_P:
+                            if (event.key.repeat == 0)
+                            {
+                                stopMus();
+                                cleanMu();
+                            }
+                            break;
+                        case SDL_SCANCODE_O:
+                            if (event.key.repeat == 0)
+                            {
+                                playMus("resources/spel.MP3");
+                            }
+                            break;
+                        default:
+                            handleInput(&event, pGame, keys);
+                            break;
+                        }
+                    }
+                    break;
                 default:
                     handleInput(&event, pGame, keys);
                     break;
@@ -451,4 +474,3 @@ void CheckCollison(Game *pGame, int zombieCount)
         }
     }
 }
-
