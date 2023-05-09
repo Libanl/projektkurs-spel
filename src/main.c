@@ -8,7 +8,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "../includes/zombie.h" // include the zombies header file                   //game over funkar konstigt det blir seg.fault efter //collision detection funkar men inte riktigt som den ska
 #include "../includes/spelare.h"
-#include "../includes/music.h"
+#include "../includes/music.h"                                                       //bullet collision behövs det en rect member i structen?
 #include "../includes/bullet.h"
 #include "../includes/text.h"
 #define WINDOW_WIDTH 1000
@@ -474,10 +474,6 @@ void resetZombies(Game *pGame)
         destroyZombie(pGame->pZombies[i]);
     }
     pGame->Nrofzombies = 0;
-    /*for (int i = 0; i < pGame->nrOfAsteroids; i++)
-    {
-        pGame->pAsteroids[i] = createAsteroid(pGame->pAsteroidImage, WINDOW_WIDTH, WINDOW_HEIGHT);
-    }*/
 }
 
 /*void CheckCollison(Game *pGame, int zombieCount)
