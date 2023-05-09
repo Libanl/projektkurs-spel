@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -63,8 +64,7 @@ int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
 void updateNrOfZombies(Game *pGame);
-
-void CheckCollison(Game *pGame, int zombieCount);
+bool DoBoxesIntersect(SDL_Rect *a, SDL_Rect *b);
 
 int main(int argv, char **args)
 {
@@ -253,6 +253,11 @@ void run(Game *pGame)
             {
                 updateZombie(pGame->pZombies[i]);
             }
+            for (int i = 0; i < pGame->Nrofzombies; i++)
+            {
+                if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
+                    pGame->state = GAME_OVER;
+            }
             drawSpelare(pGame->pSpelare);
             for (int i = 0; i < pGame->Nrofzombies; i++)
             {
@@ -268,6 +273,7 @@ void run(Game *pGame)
             {
                 pGame->state = GAME_OVER;
             }
+
             endTime = SDL_GetTicks();
             if (endTime - startTime < frameTime)
             {
@@ -460,7 +466,7 @@ void updateNrOfZombies(Game *pGame)
     }
 }
 
-void CheckCollison(Game *pGame, int zombieCount)
+/*void CheckCollison(Game *pGame, int zombieCount)
 {
     int i;
     for (i = 0; i < zombieCount; i++)
@@ -473,4 +479,7 @@ void CheckCollison(Game *pGame, int zombieCount)
             break;
         }
     }
+
+
 }
+*/

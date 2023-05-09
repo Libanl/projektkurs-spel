@@ -206,3 +206,17 @@ void resetSpelare(Spelare *pSpelare)
     pSpelare->nyframe = 6;
 }
 
+/*int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
+{
+    return distance(pSpelare->shipRect.x + pSpelare->shipRect.w / 2, pSpelare->shipRect.y + pSpelare->shipRect.h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pSpelare->shipRect.w + rect.w) / 2;
+}*/
+
+int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
+{
+    return distance(pSpelare->shipRect->x + pSpelare->shipRect->w / 2, pSpelare->shipRect->y + pSpelare->shipRect->h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pSpelare->shipRect->w + rect.w) / 2;
+}
+
+float distance(int x1, int y1, int x2, int y2)
+{
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
