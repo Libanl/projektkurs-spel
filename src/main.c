@@ -346,8 +346,6 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[])
         keys[pEvent->key.keysym.scancode] = 0; // Set the corresponding key state to false
     }
 
-    // Check for combination of keys pressed together
-
     if (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A])
     {
         moveUp(pGame->pSpelare);
