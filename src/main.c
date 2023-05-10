@@ -96,7 +96,7 @@ int initiate(Game *pGame)
     playMus("resources/spel.MP3");
 
     pGame->pWindow = SDL_CreateWindow("Zombies COD", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    pGame->pRenderer = SDL_CreateRenderer(pGame->pWindow, -1, SDL_RENDERER_ACCELERATE | SDL_RENDERER_PRESENTVSYNC);
 
     pGame->pGame_StartBackgroundimage = IMG_Load("resources/iFiO8.png");
     if (!pGame->pGame_StartBackgroundimage)
