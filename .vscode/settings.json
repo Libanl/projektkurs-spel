@@ -1,16 +1,16 @@
 {
-        "files.associations": {
-            "spelare.h": "c",
-            "stdlib.h": "c",
-            "stdio.h": "c",
-            "bullet.h": "c",
-            "music.h": "c",
-            "zombie.h": "c",
-            "sdl.h": "c",
-            "sdl_image.h": "c",
-            "text.h": "c",
-            "sdl_ttf.h": "c",
-            "math.h": "c",
-            "time.h": "c"
-        }
+    "files.associations": {
+        "spelare.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "bullet.h": "c",
+        "music.h": "c",
+        "zombie.h": "c",
+        "sdl.h": "c",
+        "sdl_image.h": "c",
+        "text.h": "c",
+        "sdl_ttf.h": "c",
+        "math.h": "c",
+        "time.h": "c"
     }
+}
