@@ -264,6 +264,14 @@ void run(Game *pGame)
                 if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
                     pGame->state = GAME_OVER;
             }
+            /*if (pGame->Nrofzombies > 10)
+            {
+                for (int i = 0; i < pGame->Nrofzombies; i++)
+                {
+                    if (collideBullet(pGame->pBullet, getRectZombie(pGame->pZombies[i])))
+                        
+                }
+            }*/
             if (pGame->pScoreText)
             {
                 drawText(pGame->pScoreText);
