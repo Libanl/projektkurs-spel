@@ -12,6 +12,8 @@ ZombieImage *initiateZombie(SDL_Renderer *pRenderer);
 Zombie *createZombie(ZombieImage *pZombieImage, int window_width, int window_height);
 void updateZombie(Zombie *pZombie);
 void drawZombie(Zombie *pZombie);
+void destroyZombies(Zombie *pZombie);
+void destroyZombieimage(ZombieImage *pZombieImage);
 
 
 

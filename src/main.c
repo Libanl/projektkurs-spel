@@ -63,6 +63,7 @@ int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
 void updateNrOfZombies(Game *pGame);
+void resetZombies(Game *pGame);
 
 //void CheckCollison( Game *pGame, int zombieCount);
 
@@ -174,7 +175,7 @@ int initiate(Game *pGame)
 
     pGame->Nrofzombies=0;
     pGame->timeForNextZombie=3;
-   
+    resetZombies(pGame);
 
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Game over",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pOverFont,"Press space to start OR M (TO GO BACK TO MENU)",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
@@ -246,7 +247,7 @@ void run(Game *pGame)
                 SDL_Delay(10);
 
                 SDL_RenderPresent(pGame->pRenderer);
-                if(getTime(pGame)==100){
+                if(getTime(pGame)==10){
                     pGame->state= GAME_OVER;
                 }
                 break;
@@ -254,7 +255,7 @@ void run(Game *pGame)
                 drawText(pGame->pOverText);
                 drawText(pGame->pStartText);
                 resetSpelare(pGame->pSpelare);
-                pGame->Nrofzombies=0;
+                resetZombies(pGame);
                 pressed=0;  
         case START:
             if (first == 1)
@@ -382,6 +383,8 @@ void close(Game *pGame)
     SDL_FreeSurface(pGame->pGame_StartBackgroundimage);
     SDL_DestroyTexture(pGame->pbackgroundTexture);
     SDL_FreeSurface(pGame->pbackgroundImage);
+    for(int i=0;i<pGame->Nrofzombies;i++) destroyZombies(pGame->pZombies[i]);
+    if(pGame->pZombieImage) destroyZombieimage(pGame->pZombieImage);
     //SDL_DestroyTexture(pGame->pZombieTexture);
     //SDL_FreeSurface(pGame->pZombieImage);
     SDL_DestroyRenderer(pGame->pRenderer);
@@ -433,6 +436,14 @@ void updateNrOfZombies(Game *pGame){
         pGame->Nrofzombies++; 
     }    
      
+}
+
+void resetZombies(Game *pGame){
+    for(int i=0;i<pGame->Nrofzombies;i++) destroyZombies(pGame->pZombies[i]);
+    pGame->Nrofzombies = 10;
+    for(int i=0;i<pGame->Nrofzombies;i++){
+        pGame->pZombies[i] = createZombie(pGame->pZombieImage,WINDOW_WIDTH,WINDOW_HEIGHT);
+    }
 }
 
 

@@ -122,6 +122,14 @@ void drawZombie(Zombie *pZombie){
     SDL_RenderCopyEx(pZombie->pRenderer,pZombie->pTexture,NULL,&(pZombie->rect),pZombie->renderAngle,NULL,SDL_FLIP_NONE);
 }
 
+void destroyZombies(Zombie *pZombie){
+    free(pZombie);
+}
+
+void destroyZombieimage(ZombieImage *pZombieImage){
+    SDL_DestroyTexture(pZombieImage->pTexture);
+}
+
 
 /*Zombie *createZombie(int x, int y, SDL_Renderer *pRenderer, int window_width, int window_height)
 {
