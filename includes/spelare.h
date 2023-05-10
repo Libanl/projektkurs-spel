@@ -18,6 +18,8 @@ void fireSpelare(Spelare *pSpelare, int moveUp, int moveLeft, int moveDown, int 
 void resetSpelare(Spelare *pSpelare);
 int collideSpelare(Spelare *pSpelare, SDL_Rect rect);
 float distance(int x1, int y1, int x2, int y2);
+int bulletColission(Spelare *pSpelare, SDL_Rect rect);
+
 
 
 #endif
