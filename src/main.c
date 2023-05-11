@@ -227,7 +227,7 @@ void run(Game *pGame)
                             break;
                         case SDL_SCANCODE_O:
                             if (event.key.repeat == 0)
-                            {
+                            {   initMus();
                                 playMus("resources/spel.MP3");
                             }
                             break;
