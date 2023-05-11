@@ -312,14 +312,21 @@ void run(Game *pGame)
                     int mouseX, mouseY;
                     SDL_GetMouseState(&mouseX, &mouseY);
                    
+                    SDL_Log("Mouse pressed down at (%d,%d)", mouseX, mouseY);
                     
+    
                     if (mouseX >= 149 && mouseX <= 439 && mouseY >= 134 && mouseY <= 217)
                         {
                         pressed=1;
-                            
+                    
                         }
                      
-                }
+                    if (mouseX >= 149 && mouseX <= 437 && mouseY >= 433 && mouseY <= 510)
+                        {
+                        isRunning = 0;
+                    
+                        }
+                                     }
                 else if (pressed == 1)
                 {
                     pGame->startTime = SDL_GetTicks64();
