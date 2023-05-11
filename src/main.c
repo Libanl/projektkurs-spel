@@ -312,7 +312,6 @@ void run(Game *pGame)
                     int mouseX, mouseY;
                     SDL_GetMouseState(&mouseX, &mouseY);
                    
-                    SDL_Log("Mouse pressed down at (%d,%d)", mouseX, mouseY);
                     
     
                     if (mouseX >= 149 && mouseX <= 439 && mouseY >= 134 && mouseY <= 217)
