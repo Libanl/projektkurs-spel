@@ -67,7 +67,7 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
 
     pSpelare->gsprites[4].x = 0;
     pSpelare->gsprites[4].y = 210;
-    pSpelare->gsprites[4].w = 96;
+    pSpelare->gsprites[4].w = 96;     // här är problemet
     pSpelare->gsprites[4].h = 70;
 
     pSpelare->gsprites[5].x = 288;
@@ -171,6 +171,7 @@ void updateSpelare(Spelare *pSpelare)
     pSpelare->shipRect[pSpelare->frame].y = pSpelare->y;
     pSpelare->frame = pSpelare->nyframe;
     updateBullet(pSpelare->pBullet);
+    printf("X: %d Y: %d ", pSpelare->shipRect[pSpelare->frame].x, pSpelare->shipRect[pSpelare->frame].y);
 }
 
 void fireSpelare(Spelare *pSpelare, int m1, int m2, int m3, int m4)
@@ -215,5 +216,3 @@ float distance(int x1, int y1, int x2, int y2)
 {
     return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
-
-
