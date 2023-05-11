@@ -209,20 +209,32 @@ void run(Game *pGame)
                     isRunning = 0;
                     break;
                 case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE && event.key.keysym.sym != SDLK_o && event.key.keysym.sym != SDLK_p)
+                    if (event.key.keysym.sym == SDLK_ESCAPE)
                     {
                         isRunning = 0;
                     }
-                    else if (event.key.keysym.sym != SDLK_ESCAPE && event.key.keysym.sym == SDLK_o)
+                    else
                     {
-                        stopMus();
-                        cleanMu();
-                        music = NULL;
-                    }
-                    else if (event.key.keysym.sym != SDLK_ESCAPE && event.key.keysym.sym == SDLK_p)
-                    {
-                        initMus();
-                        playMus("resources/spel.MP3");
+                        switch (event.key.keysym.scancode)
+                        {
+                        case SDL_SCANCODE_P:
+                            if (event.key.repeat == 0)
+                            {
+                                stopMus();
+                                cleanMu();
+                                music = NULL;
+                            }
+                            break;
+                        case SDL_SCANCODE_O:
+                            if (event.key.repeat == 0)
+                            {
+                                playMus("resources/spel.MP3");
+                            }
+                            break;
+                        default:
+                            handleInput(&event, pGame, keys);
+                            break;
+                        }
                     }
                     break;
                 default:
