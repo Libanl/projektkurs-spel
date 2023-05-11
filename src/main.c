@@ -8,7 +8,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "../includes/zombie.h" // include the zombies header file                   //game over funkar konstigt det blir seg.fault efter //collision detection funkar men inte riktigt som den ska
 #include "../includes/spelare.h"
-#include "../includes/music.h"                                                       //bullet collision behövs det en rect member i structen?
+#include "../includes/music.h" //bullet collision behövs det en rect member i structen?
 #include "../includes/bullet.h"
 #include "../includes/text.h"
 #define WINDOW_WIDTH 1000
@@ -209,31 +209,20 @@ void run(Game *pGame)
                     isRunning = 0;
                     break;
                 case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
+                    if (event.key.keysym.sym == SDLK_ESCAPE && event.key.keysym.sym != SDLK_o && event.key.keysym.sym != SDLK_p)
                     {
                         isRunning = 0;
                     }
-                    else
+                    else if (event.key.keysym.sym != SDLK_ESCAPE && event.key.keysym.sym == SDLK_o)
                     {
-                        switch (event.key.keysym.scancode)
-                        {
-                        case SDL_SCANCODE_P:
-                            if (event.key.repeat == 0)
-                            {
-                                stopMus();
-                                cleanMu();
-                            }
-                            break;
-                        case SDL_SCANCODE_O:
-                            if (event.key.repeat == 0)
-                            {
-                                playMus("resources/spel.MP3");
-                            }
-                            break;
-                        default:
-                            handleInput(&event, pGame, keys);
-                            break;
-                        }
+                        stopMus();
+                        cleanMu();
+                        music = NULL;
+                    }
+                    else if (event.key.keysym.sym != SDLK_ESCAPE && event.key.keysym.sym == SDLK_p)
+                    {
+                        initMus();
+                        playMus("resources/spel.MP3");
                     }
                     break;
                 default:
