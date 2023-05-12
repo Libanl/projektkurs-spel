@@ -67,7 +67,7 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
 
     pSpelare->gsprites[4].x = 0;
     pSpelare->gsprites[4].y = 210;
-    pSpelare->gsprites[4].w = 96;     // här är problemet
+    pSpelare->gsprites[4].w = 96; // här är problemet
     pSpelare->gsprites[4].h = 70;
 
     pSpelare->gsprites[5].x = 288;
@@ -207,12 +207,57 @@ void resetSpelare(Spelare *pSpelare)
     pSpelare->nyframe = 6;
 }
 
-int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
-{
-    return distance(pSpelare->shipRect->x + pSpelare->shipRect->w / 2, pSpelare->shipRect->y + pSpelare->shipRect->h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pSpelare->shipRect->w + rect.w) / 2;
-}
-
+// Calculate the distance between two points
+// Calculate the distance between two points
 float distance(int x1, int y1, int x2, int y2)
 {
-    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    return sqrtf(powf(x2 - x1, 2) + powf(y2 - y1, 2));
+}
+
+int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
+{
+    int player_center_x = pSpelare->x + pSpelare->shipRect[pSpelare->frame].w / 2;
+    int player_center_y = pSpelare->y + pSpelare->shipRect[pSpelare->frame].h / 2;
+
+    int rect_center_x = rect.x + rect.w / 2;
+    int rect_center_y = rect.y + rect.h / 2;
+
+    int dx = abs(player_center_x - rect_center_x);
+    int dy = abs(player_center_y - rect_center_y);
+
+    int half_w = pSpelare->shipRect[pSpelare->frame].w / 2 + rect.w / 2;
+    int half_h = pSpelare->shipRect[pSpelare->frame].h / 2 + rect.h / 2;
+
+    if (dx > half_w || dy > half_h)
+    {
+        return 0; // no collision
+    }
+
+    int px = abs(dx - half_w);
+    int py = abs(dy - half_h);
+
+    if (px <= py)
+    {
+        if (player_center_x < rect_center_x)
+        {
+            pSpelare->x -= px;
+        }
+        else
+        {
+            pSpelare->x += px;
+        }
+    }
+    else
+    {
+        if (player_center_y < rect_center_y)
+        {
+            pSpelare->y -= py;
+        }
+        else
+        {
+            pSpelare->y += py;
+        }
+    }
+
+    return 1; // collision detected
 }

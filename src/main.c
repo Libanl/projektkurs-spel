@@ -265,6 +265,7 @@ void run(Game *pGame)
                 if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
                     pGame->state = GAME_OVER;
             }
+
             if (pGame->pScoreText)
             {
                 drawText(pGame->pScoreText);
@@ -278,10 +279,6 @@ void run(Game *pGame)
 
             endTime = SDL_GetTicks();
             SDL_Delay(10);
-            /*if (endTime - startTime < frameTime)
-            {
-                SDL_Delay(frameTime - (endTime - startTime));
-            }*/
 
             break;
         case GAME_OVER:
