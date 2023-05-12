@@ -263,7 +263,16 @@ void run(Game *pGame)
             for (int i = 0; i < pGame->Nrofzombies; i++)
             {
                 if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
-                    pGame->state = GAME_OVER;
+                {
+                    destroyZombie(pGame->pZombies[i]);
+                    for (int j = i; j < pGame->Nrofzombies - 1; j++)
+                    {
+                        pGame->pZombies[j] = pGame->pZombies[j + 1];
+                    }
+                    pGame->Nrofzombies--;
+                }
+
+                // pGame->state = GAME_OVER;
             }
 
             if (pGame->pScoreText)
