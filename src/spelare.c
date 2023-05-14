@@ -107,6 +107,7 @@ void moveLeft(Spelare *pSpelare)
     {
         pSpelare->nyframe = 2;
     }
+    updateSpelare(pSpelare);
 }
 
 void moveRight(Spelare *pSpelare)
@@ -125,6 +126,7 @@ void moveRight(Spelare *pSpelare)
     {
         pSpelare->nyframe = 2;
     }
+    updateSpelare(pSpelare);
 }
 
 void moveUp(Spelare *pSpelare)
@@ -144,6 +146,7 @@ void moveUp(Spelare *pSpelare)
         pSpelare->nyframe = 4;
     }
     pSpelare->shipRect[pSpelare->frame].y = pSpelare->y;
+    updateSpelare(pSpelare);
 }
 
 void moveDown(Spelare *pSpelare)
@@ -163,6 +166,7 @@ void moveDown(Spelare *pSpelare)
         pSpelare->nyframe = 0;
     }
     pSpelare->shipRect[pSpelare->frame].y = pSpelare->y;
+    updateSpelare(pSpelare);
 }
 
 void updateSpelare(Spelare *pSpelare)
