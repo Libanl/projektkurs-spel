@@ -1,6 +1,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "../includes/bullet.h"
+#include "../includes/zombie.h"
+#include "../includes/spelare.h"
+#include <stdbool.h>
 
 struct bullet
 {
@@ -20,6 +23,7 @@ Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_heigh
     pBullet->window_width = window_width;
     pBullet->window_height = window_height;
     pBullet->time = 0;
+    // pBullet->bulletRect = {pBullet->x, pBullet->y, 16, 16};
 
     SDL_Surface *rightSurface = IMG_Load("resources/bullet.png");
     SDL_Surface *downSurface = IMG_Load("resources/bulletDown.png");
@@ -39,10 +43,10 @@ Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_heigh
     SDL_FreeSurface(leftSurface);
     SDL_FreeSurface(rightSurface);
 
-   /* pBullet->bulletRect.w = pBullet->bulletRect.w / 1.5;
-    pBullet->bulletRect.h = pBullet->bulletRect.h / 1.5;             //colission detction??+ försökt på samma sätt som spelare.c
-    pBullet->x = pBullet->x - pBullet->bulletRect.w;
-    pBullet->y = pBullet->y - pBullet->bulletRect.h;*/
+    pBullet->bulletRect.x = pBullet->x;
+    pBullet->bulletRect.y = pBullet->y;
+    pBullet->bulletRect.w = 16;
+    pBullet->bulletRect.h = 16;
 
     return pBullet;
 }
@@ -107,8 +111,9 @@ void drawBullet(Bullet *pBullet, SDL_Renderer *pRenderer)
 {
     if (pBullet->time == 0)
         return;
-    SDL_Rect bulletRect = {pBullet->x, pBullet->y, 16, 16}; // Replace 16 with your texture width and height
-    SDL_RenderCopy(pRenderer, pBullet->pTexture, NULL, &bulletRect);
+    SDL_Rect bulletRect = {pBullet->x, pBullet->y, 16, 16};
+    pBullet->bulletRect = bulletRect;
+    SDL_RenderCopy(pRenderer, pBullet->pTexture, NULL, &pBullet->bulletRect);
 }
 
 float xBullet(Bullet *pBullet)
@@ -133,4 +138,14 @@ void destroyBullet(Bullet *pBullet)
 int aliveBullet(Bullet *pBullet)
 {
     return pBullet->time > 0;
+}
+
+SDL_Rect getRectBullet(Bullet *pBullet)
+{
+    return pBullet->bulletRect;
+}
+
+int collideBullet(Bullet *pBullet, SDL_Rect rect)
+{
+    return distance(pBullet->bulletRect.x + pBullet->bulletRect.w / 2, pBullet->bulletRect.y + pBullet->bulletRect.h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pBullet->bulletRect.w + rect.w) / 2;
 }

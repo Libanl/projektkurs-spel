@@ -227,7 +227,8 @@ void run(Game *pGame)
                             break;
                         case SDL_SCANCODE_O:
                             if (event.key.repeat == 0)
-                            {   initMus();
+                            {
+                                initMus();
                                 playMus("resources/spel.MP3");
                             }
                             break;
@@ -262,25 +263,31 @@ void run(Game *pGame)
             for (int i = 0; i < pGame->Nrofzombies; i++)
             {
                 if (collideSpelare(pGame->pSpelare, getRectZombie(pGame->pZombies[i])))
-                    pGame->state = GAME_OVER;
+                {
+                    destroyZombie(pGame->pZombies[i]);
+                    for (int j = i; j < pGame->Nrofzombies - 1; j++)
+                    {
+                        pGame->pZombies[j] = pGame->pZombies[j + 1];
+                    }
+                    pGame->Nrofzombies--;
+                }
+
+                // pGame->state = GAME_OVER;
             }
+
             if (pGame->pScoreText)
             {
                 drawText(pGame->pScoreText);
             }
 
             SDL_RenderPresent(pGame->pRenderer);
-            if (getTime(pGame) == 100)
+            if (getTime(pGame) == pGame->timeForNextZombie * MAX_ZOMBIES)
             {
                 pGame->state = GAME_OVER;
             }
 
             endTime = SDL_GetTicks();
             SDL_Delay(10);
-            /*if (endTime - startTime < frameTime)
-            {
-                SDL_Delay(frameTime - (endTime - startTime));
-            }*/
 
             break;
         case GAME_OVER:
@@ -311,21 +318,12 @@ void run(Game *pGame)
                 {
                     int mouseX, mouseY;
                     SDL_GetMouseState(&mouseX, &mouseY);
-                   
-                    
-    
+
                     if (mouseX >= 149 && mouseX <= 439 && mouseY >= 134 && mouseY <= 217)
-                        {
-                        pressed=1;
-                    
-                        }
-                     
-                    if (mouseX >= 149 && mouseX <= 437 && mouseY >= 433 && mouseY <= 510)
-                        {
-                        isRunning = 0;
-                    
-                        }
-                                     }
+                    {
+                        pressed = 1;
+                    }
+                }
                 else if (pressed == 1)
                 {
                     pGame->startTime = SDL_GetTicks64();
