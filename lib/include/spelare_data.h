@@ -1,5 +1,7 @@
 #ifndef spelare_data_h
 #define spelare_data_h
+
+#define MAX_ZOMBIES 40
 #define MAX_SPELARE 2
 
 enum gameState{START, ONGOING, GAME_OVER};
@@ -26,8 +28,15 @@ struct spelareData{
 };
 typedef struct spelareData SpelareData;   
 
+struct zombieData{
+    int x, y;
+    int vx, vy;
+};
+typedef struct zombieData ZombieData;
+
 struct serverData{
     SpelareData spelare[MAX_SPELARE];
+    //ZombieData zombie[MAX_ZOMBIES];
     int playerNr;
     GameState gState;
 };

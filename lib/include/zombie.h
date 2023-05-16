@@ -13,6 +13,11 @@ void updateZombie(Zombie *pZombie);
 void drawZombie(Zombie *pZombie);
 SDL_Rect getRectZombie(Zombie *pZombie);
 void destroyZombie(Zombie *pZombie);
+void destroyZombieImage(ZombieImage *pZombieImage);
+void getZombieSendData(Zombie *pZombie, ZombieData *pZombieData);
+void updateZombiesWithRecievedData(Zombie *pZombie, ZombieData *pZombieData);
+
+
 
 
 #endif
