@@ -19,7 +19,7 @@
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 750
-#define MAX_ZOMBIES 200
+#define MAX_ZOMBIES 40
 
 
 struct game{
@@ -27,11 +27,13 @@ struct game{
     SDL_Renderer *pRenderer;
     Spelare *pSpelare[MAX_SPELARE];
     Bullet *pBullet;
+    ZombieImage *pZombieImage;
+    Zombie *pZombies[MAX_ZOMBIES];
     SDL_Rect zombieRect[MAX_ZOMBIES];
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
-    SDL_Surface *pZombieImage; 
-    SDL_Texture *pZombieTexture;
+    int Nrofzombies;
+    int timeForNextZombie;
     int MoveUp;
     int MoveLeft;
     int MoveDown;
@@ -59,6 +61,8 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
+void updateNrOfZombies(Game *pGame);
+void resetZombies(Game *pGame);
 //void CheckCollison( Game *pGame, int zombieCount);
 void add(IPaddress address, IPaddress clients[],int *pNrOfClients);
 void executeCommand(Game *pGame,ClientData cData);
@@ -124,25 +128,6 @@ int initiate(Game *pGame){
         return 1;
     }
 
-    pGame->pZombieImage = IMG_Load("resources/zombie.png");
-    if (!pGame->pZombieImage)
-    {
-        printf("Error! ZombieImage failed\n", IMG_GetError());
-        SDL_DestroyTexture(pGame->pbackgroundTexture);
-        SDL_FreeSurface(pGame->pbackgroundImage);
-        return 1;
-    }
-
-    pGame->pZombieTexture = SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->pZombieImage);
-    if (!pGame->pZombieTexture)
-    {
-        printf("Failed to create zombie texture: %s\n", SDL_GetError());
-        SDL_FreeSurface(pGame->pZombieImage);
-        SDL_DestroyTexture(pGame->pbackgroundTexture);
-        SDL_FreeSurface(pGame->pbackgroundImage);
-        return 1;
-    }
-
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
     if(!pGame->pFont || !pGame->pScoreFont){
@@ -170,7 +155,6 @@ int initiate(Game *pGame){
     pGame->MoveRight=0;
 
     for(int i=0;i<MAX_SPELARE;i++){
-        //printf("%d", i);
         pGame->pSpelare[i] = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
     pGame->nr_of_spelare = MAX_SPELARE;
@@ -182,15 +166,21 @@ int initiate(Game *pGame){
             return 0;
         }
     }
+
+    pGame->pZombieImage = initiateZombie(pGame->pRenderer);
+
     
-    pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Game over",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
+    pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Time ran out",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pScoreFont,"Waiting for clients..",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
-    pGame->pTestText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"hello world",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     pGame->startTime = SDL_GetTicks64();
     pGame->gameTime = -1;
     pGame->state = START;
+
     pGame->nrOfClients = 0;
 
+    pGame->Nrofzombies = 0;
+    pGame->timeForNextZombie = 3;
+    //resetZombies(pGame);
     return 1;
 }
 
@@ -209,7 +199,6 @@ void run(Game *pGame){
         switch (pGame->state)
         {
             case ONGOING:
-
                 sendGameData(pGame);
                 while(SDLNet_UDP_Recv(pGame->pSocket,pGame->pPacket)==1){
                     memcpy(&cData, pGame->pPacket->data, sizeof(ClientData));
@@ -234,32 +223,44 @@ void run(Game *pGame){
                 updateGameTime(pGame);
                 SDL_RenderClear(pGame->pRenderer);        
                 SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
-                for(int i=0;i<MAX_SPELARE;i++)
-                    drawSpelare(pGame->pSpelare[i]);
-               
+                updateNrOfZombies(pGame);
+                for (int i = 0; i < (pGame->Nrofzombies); i++) updateZombie(pGame->pZombies[i]);
+
+                for(int i=0;i<MAX_SPELARE;i++) drawSpelare(pGame->pSpelare[i]);
+                    
+                for (int i = 0; i < pGame->Nrofzombies; i++) drawZombie(pGame->pZombies[i]);
+                
                 if(pGame->pScoreText) {
                     drawText(pGame->pScoreText);
                 }
                 SDL_Delay(10);
-
+                if(getTime(pGame)==10){
+                    pGame->state=GAME_OVER;
+                }
                 SDL_RenderPresent(pGame->pRenderer);
-                /*if(getTime(pGame)==300){
-                    isRunning = 0;
-                }*/
+              
                 break;
+            case GAME_OVER:
+            drawText(pGame->pOverText);
+            sendGameData(pGame);
+            if(pGame->nrOfClients==MAX_SPELARE) pGame->nrOfClients = 0;
             case START:
                 drawText(pGame->pStartText);
                 SDL_RenderPresent(pGame->pRenderer);
                     if(SDL_PollEvent(&event)){
                         if(event.type==SDL_QUIT) isRunning = 0;
-                    } 
+                    }       
+
                     if(SDLNet_UDP_Recv(pGame->pSocket,pGame->pPacket)==1){
+
                         add(pGame->pPacket->address,pGame->clients,&(pGame->nrOfClients));
-                        
+
                         if (pGame->nrOfClients==MAX_SPELARE)
-                        {
+                        {   
                             for(int i=0;i<MAX_SPELARE;i++) resetSpelare(pGame->pSpelare[i]);
                             pGame->nr_of_spelare=MAX_SPELARE;
+                            pGame->startTime = SDL_GetTicks64();
+                            pGame->gameTime = -1;
                             pGame->state = ONGOING;
                         } 
                     }
@@ -271,6 +272,10 @@ void run(Game *pGame){
 void close(Game *pGame){
     stopMus();
     cleanMu();
+    //for (int i = 0; i < pGame->Nrofzombies; i++) if(pGame->pZombies[i]) destroyZombie(pGame->pZombies[i]);  
+    for(int i=0;i<MAX_SPELARE;i++) if(pGame->pSpelare[i]) destroySpelare(pGame->pSpelare[i]);
+    resetZombies(pGame);
+    if(pGame->pZombieImage) destroyZombieImage(pGame->pZombieImage);
     SDL_DestroyTexture(pGame->pbackgroundTexture);
     SDL_FreeSurface(pGame->pbackgroundImage);
     SDL_DestroyRenderer(pGame->pRenderer);
@@ -307,16 +312,6 @@ void updateGameTime(Game *pGame){
             pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
         }
 }
-
-/*void CheckCollison(Game *pGame, int zombieCount){
-    int i;
-    for(i = 0; i < zombieCount; i++){
-        if((xBullet(pGame->pBullet) > pGame->zombieRect[i].x && xBullet(pGame->pBullet) < pGame->zombieRect[i].x + 30) && 
-           (yBullet(pGame->pBullet) > pGame->zombieRect[i].y && yBullet(pGame->pBullet) < pGame->zombieRect[i].y + 30)){
-            killBullet(pGame->pBullet);
-        }
-    }   
-}*/
 
 void add(IPaddress address, IPaddress clients[],int *pNrOfClients){
 	for(int i=0;i<*pNrOfClients;i++){
@@ -365,12 +360,35 @@ void executeCommand(Game *pGame,ClientData cData){
     }
 }
 
+void resetZombies(Game *pGame)
+{
+    for (int i = 0; i < pGame->Nrofzombies; i++)
+    {
+        destroyZombie(pGame->pZombies[i]);  
+    }
+}
+
+void updateNrOfZombies(Game *pGame)
+{
+    if (getTime(pGame) > pGame->timeForNextZombie && pGame->Nrofzombies < MAX_ZOMBIES)
+    {
+        (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
+        pGame->pZombies[pGame->Nrofzombies] = createZombie(pGame->pZombieImage, WINDOW_WIDTH, WINDOW_HEIGHT);
+        pGame->Nrofzombies++;
+    }
+}
 
 void sendGameData(Game *pGame){
     pGame->sData.gState = pGame->state;
     for(int i=0;i<MAX_SPELARE;i++){
         getSpelareSendData(pGame->pSpelare[i], &(pGame->sData.spelare[i]));
     }
+    //printf("%d", pGame->Nrofzombies);
+    /*if(pGame->Nrofzombies>0){
+        for(int i=0;i<pGame->Nrofzombies;i++){
+        getZombieSendData(pGame->pZombies[i], &(pGame->sData.zombie[i]));
+        }
+    }*/
     for(int i=0;i<MAX_SPELARE;i++){
         pGame->sData.playerNr = i;
         memcpy(pGame->pPacket->data, &(pGame->sData), sizeof(ServerData));

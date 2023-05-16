@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../lib/include/spelare_data.h"
 #include "../../lib/include/zombie.h"
 
 struct zombieImage
@@ -135,5 +136,27 @@ SDL_Rect getRectZombie(Zombie *pZombie)
 
 void destroyZombie(Zombie *pZombie)
 {
+    SDL_DestroyTexture(pZombie->pTexture);
     free(pZombie);
+}
+
+void destroyZombieImage(ZombieImage *pZombieImage)
+{
+    SDL_DestroyTexture(pZombieImage->pTexture);
+}
+
+void getZombieSendData(Zombie *pZombie, ZombieData *pZombieData){
+ 
+    pZombieData->x = pZombie->x;
+    pZombieData->y = pZombie->y;
+    pZombieData->vx = pZombie->vx;
+    pZombieData->vy = pZombie->vy;
+}
+
+void updateZombiesWithRecievedData(Zombie *pZombie, ZombieData *pZombieData){
+
+    pZombie->x = pZombieData->x;
+    pZombie->y = pZombieData->y;
+    pZombie->vx = pZombieData->vx;
+    pZombie->vy = pZombieData->vy;
 }
