@@ -10,10 +10,12 @@ Bullet *createBullet(SDL_Renderer *pRenderer, int window_width, int window_heigh
 void updateBullet(Bullet *pBullet);
 void startBullet(Bullet *pBullet, float x, float y, int moveup, int moveleft, int movedown, int moveright);
 void killBullet(Bullet *pBullet);
-void drawBullet(Bullet *pBullet,SDL_Renderer *pRenderer);
+void drawBullet(Bullet *pBullet, SDL_Renderer *pRenderer);
 float xBullet(Bullet *pBullet);
 float yBullet(Bullet *pBullet);
 void destroyBullet(Bullet *pBullet);
 int aliveBullet(Bullet *pBullet);
+SDL_Rect getRectBullet(Bullet *pBullet);
+int collideBullet(Bullet *pBullet, SDL_Rect rect);
 
 #endif

@@ -1,8 +1,8 @@
 INCLUDE = C:\msys64\mingw64\include
 LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -mwindows -lm
 
-spelare: main.o zombie.o spelare.o music.o bullet.o text.o
-	gcc -o spelare main.o zombie.o spelare.o music.o bullet.o text.o $(LDFLAGS)
+spelare: main.o zombie.o spelare.o powerup.o music.o bullet.o text.o
+	gcc -o spelare main.o zombie.o spelare.o powerup.o music.o bullet.o text.o $(LDFLAGS)
 
 main.o: ./src/main.c
 	gcc -c ./src/main.c
@@ -12,6 +12,9 @@ zombie.o: ./src/zombie.c ./includes/zombie.h
 
 spelare.o: ./src/spelare.c ./includes/spelare.h
 	gcc -c ./src/spelare.c
+
+powerup.o: ./src/powerup.c ./includes/powerup.h
+	gcc -c ./src/powerup.c
 
 music.o: ./src/music.c ./includes/music.h
 	gcc -c ./src/music.c
