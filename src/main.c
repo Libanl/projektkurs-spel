@@ -529,7 +529,6 @@ void resetZombies(Game *pGame)
     pGame->Nrofzombies = 0;
 }
 
-
 /*void CheckCollison(Game *pGame, int zombieCount)
 {
     int i;
