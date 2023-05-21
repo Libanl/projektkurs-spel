@@ -136,7 +136,7 @@ SDL_Rect getRectZombie(Zombie *pZombie)
 
 void destroyZombie(Zombie *pZombie)
 {
-    SDL_DestroyTexture(pZombie->pTexture);
+    //SDL_DestroyTexture(pZombie->pTexture);
     free(pZombie);
 }
 

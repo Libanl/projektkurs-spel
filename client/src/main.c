@@ -263,18 +263,33 @@ void run(Game *pGame){
                      drawSpelare(pGame->pSpelare[i]); 
                 }
                 
+                 for (int k = 0; k < MAX_SPELARE; k++)
+                {
+                    for (int i = 0; i < pGame->Nrofzombies; i++)
+                    {
+                        if (collideSpelare(pGame->pSpelare[k], getRectZombie(pGame->pZombies[i])))
+                        {
+                            destroyZombie(pGame->pZombies[i]);
+                            for (int j = i; j < pGame->Nrofzombies - 1; j++)
+                            {
+                                pGame->pZombies[j] = pGame->pZombies[j + 1];
+                            }
+                            pGame->Nrofzombies--;
+                        }
+                    }
+                }
+
                 SDL_Delay(10);
-                if(getTime(pGame)==10){
+                if(getTime(pGame)==60){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
                 break;
             case GAME_OVER:
-                
                 drawText(pGame->pOverText);
                 drawText(pGame->pStartText);
                 for (int i = 0; i < MAX_SPELARE; i++) resetSpelare(pGame->pSpelare[i]);
-                //pGame->Nrofzombies = 0;
+                pGame->Nrofzombies = 0;
                 //pressed = 0;
             case START:
                 if(!joining){

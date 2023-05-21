@@ -229,12 +229,28 @@ void run(Game *pGame){
                 for(int i=0;i<MAX_SPELARE;i++) drawSpelare(pGame->pSpelare[i]);
                     
                 for (int i = 0; i < pGame->Nrofzombies; i++) drawZombie(pGame->pZombies[i]);
+
+                for (int k = 0; k < MAX_SPELARE; k++)
+                {
+                    for (int i = 0; i < pGame->Nrofzombies; i++)
+                    {
+                        if (collideSpelare(pGame->pSpelare[k], getRectZombie(pGame->pZombies[i])))
+                        {
+                            destroyZombie(pGame->pZombies[i]);
+                            for (int j = i; j < pGame->Nrofzombies - 1; j++)
+                            {
+                                pGame->pZombies[j] = pGame->pZombies[j + 1];
+                            }
+                            pGame->Nrofzombies--;
+                        }
+                    }
+                }
                 
                 if(pGame->pScoreText) {
                     drawText(pGame->pScoreText);
                 }
                 SDL_Delay(10);
-                if(getTime(pGame)==10){
+                if(getTime(pGame)==60){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
@@ -244,6 +260,7 @@ void run(Game *pGame){
             drawText(pGame->pOverText);
             sendGameData(pGame);
             if(pGame->nrOfClients==MAX_SPELARE) pGame->nrOfClients = 0;
+            pGame->Nrofzombies=0;
             case START:
                 drawText(pGame->pStartText);
                 SDL_RenderPresent(pGame->pRenderer);
