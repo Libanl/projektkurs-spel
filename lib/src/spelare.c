@@ -211,6 +211,54 @@ void resetSpelare(Spelare *pSpelare){
     pSpelare->y=pSpelare->window_height/2;
 }
 
+int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
+{
+    int player_center_x = pSpelare->x + pSpelare->shipRect[pSpelare->frame].w / 2;
+    int player_center_y = pSpelare->y + pSpelare->shipRect[pSpelare->frame].h / 2;
+
+    int rect_center_x = rect.x + rect.w / 2;
+    int rect_center_y = rect.y + rect.h / 2;
+
+    int dx = abs(player_center_x - rect_center_x);
+    int dy = abs(player_center_y - rect_center_y);
+
+    int half_w = pSpelare->shipRect[pSpelare->frame].w / 2 + rect.w / 2;
+    int half_h = pSpelare->shipRect[pSpelare->frame].h / 2 + rect.h / 2;
+
+    if (dx > half_w || dy > half_h)
+    {
+        return 0; // no collision
+    }
+
+    int px = abs(dx - half_w);
+    int py = abs(dy - half_h);
+
+    if (px <= py)
+    {
+        if (player_center_x < rect_center_x)
+        {
+            pSpelare->x -= px;
+        }
+        else
+        {
+            pSpelare->x += px;
+        }
+    }
+    else
+    {
+        if (player_center_y < rect_center_y)
+        {
+            pSpelare->y -= py;
+        }
+        else
+        {
+            pSpelare->y += py;
+        }
+    }
+
+    return 1; // collision detected
+}
+
 void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData){
  
     pSpelareData->x = pSpelare->x;
