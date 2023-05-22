@@ -26,7 +26,7 @@ struct spelareData{
     int x, y;
     //BulletData bData;
 };
-typedef struct spelareData SpelareData;   
+typedef struct spelareData SpelareData;  
 
 struct zombieData{
     int x, y;

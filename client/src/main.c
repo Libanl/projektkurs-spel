@@ -7,13 +7,13 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_net.h>
-
 #include "../../lib/include/text.h"
 #include "../../lib/include/music.h"
 #include "../../lib/include/spelare_data.h"
 #include "../../lib/include/zombie.h" // include the zombies header file
 #include "../../lib/include/bullet.h"
 #include "../../lib/include/spelare.h"
+#include "../../lib/include/powerup.h"
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 750
@@ -27,6 +27,7 @@ struct game{
     SDL_Rect zombieRect[MAX_ZOMBIES];
     ZombieImage *pZombieImage;
     Zombie *pZombies[MAX_ZOMBIES];
+    Powerup *pPowerup;
     int Nrofzombies;
     int timeForNextZombie;
     SDL_Surface *pGame_StartBackgroundimage;
@@ -43,6 +44,9 @@ struct game{
     int gameTimeM;
     int startTime;//in ms
     int gameTime;//in s
+    int startpowerTime;
+    int timeforPower;
+    int powerTime;
     GameState state;
 
     UDPsocket pSocket;
@@ -58,6 +62,7 @@ void run(Game *pGame);
 void close(Game *pGame);
 void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
+int getPowertime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
 void CheckCollison( Game *pGame, int zombieCount);
@@ -145,7 +150,6 @@ int initiate(Game *pGame){
     pGame->MoveDown=0;
     pGame->MoveRight=0;
     
-
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
     pGame->pOverFont = TTF_OpenFont("resources/arial.ttf", 40);
@@ -172,14 +176,12 @@ int initiate(Game *pGame){
 	}
     pGame->pPacket->address.host = pGame->serverAddress.host;
     pGame->pPacket->address.port = pGame->serverAddress.port;
-
+    
+    pGame->pPowerup= createpowerup(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     for (int i = 0; i < MAX_SPELARE; i++){
         pGame->pSpelare[i] = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
-
     pGame->pZombieImage = initiateZombie(pGame->pRenderer);
-
-
 
     pGame->nr_of_spelare = MAX_SPELARE;
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Time ran out",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
@@ -196,11 +198,14 @@ int initiate(Game *pGame){
 
     pGame->Nrofzombies = 0;
     pGame->timeForNextZombie = 3;
+    pGame->timeforPower = 5;
 
     //resetZombies(pGame);
     pGame->startTime = SDL_GetTicks64();
     pGame->gameTime = -1;
     pGame->state = START;
+    pGame->startpowerTime =SDL_GetTicks64();
+    pGame->powerTime = -1;
     return 1;
 }
 
@@ -219,6 +224,7 @@ void run(Game *pGame){
     int joining=0;
     int zombieCount = 0;      // Keep track of the current number of zombies
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
+    Uint32 endTime;
     while (isRunning)
     {   
         switch (pGame->state)
@@ -237,19 +243,20 @@ void run(Game *pGame){
                         {
                             isRunning = 0;
                         }
-                    default: handleInput(&event,pGame,keys);
+                    default: 
+                    handleInput(&event,pGame,keys);
                         break;
                     }
                 }
                 for (int i = 0; i < MAX_SPELARE; i++) updateSpelare(pGame->pSpelare[i]);
                 SDL_RenderClear(pGame->pRenderer);
-                SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
                 updateNrOfZombies(pGame);
+                
                 for (int i = 0; i < (pGame->Nrofzombies); i++){
                     updateZombie(pGame->pZombies[i]);
                 }
-
                 updateGameTime(pGame);
+                SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
                 
                 for (int i = 0; i < pGame->Nrofzombies; i++){
                     drawZombie(pGame->pZombies[i]);
@@ -263,6 +270,35 @@ void run(Game *pGame){
                      drawSpelare(pGame->pSpelare[i]); 
                 }
                 
+                if(getTime(pGame)>pGame->timeforPower){
+                    drawChest(pGame->pPowerup);
+                }
+                
+                for(int i=0; i<MAX_SPELARE; i++){
+                    if (collideSpelare(pGame->pSpelare[i], getRectchest(pGame->pPowerup))){
+                    removeChest(pGame->pPowerup);
+                    pGame->startpowerTime = -1;
+                    Powerspeed(pGame->pSpelare[i]);
+                    pGame->startpowerTime = SDL_GetTicks64();  // Spara starttiden för kraften
+                    }
+                }
+                
+
+                if (pGame->startpowerTime != -1){  // Om kraften är aktiv
+                    pGame->powerTime = SDL_GetTicks64(); 
+                    if (getPowertime(pGame) >= 5){
+                        for(int i=0; i<MAX_SPELARE; i++) regularspeed(pGame->pSpelare[i]);
+                        pGame->startpowerTime = -1;  // Nollställ starttiden för kraften
+                    }
+                }
+
+                if(getTime(pGame)==20 || getTime(pGame)==40){
+                    int flag;
+                    if(getTime(pGame)==20) flag = 0;
+                    else if(getTime(pGame)==40) flag = 1;
+                    newlocationchest(pGame->pPowerup, flag);
+                }
+
                  for (int k = 0; k < MAX_SPELARE; k++)
                 {
                     for (int i = 0; i < pGame->Nrofzombies; i++)
@@ -278,12 +314,13 @@ void run(Game *pGame){
                         }
                     }
                 }
-
-                SDL_Delay(10);
+                //endTime = SDL_GetTicks();
+                
                 if(getTime(pGame)==60){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
+                //SDL_Delay(10);
                 break;
             case GAME_OVER:
                 drawText(pGame->pOverText);
@@ -401,6 +438,7 @@ void close(Game *pGame){
     stopMus();
     cleanMu();
     for(int i=0;i<MAX_SPELARE;i++) if(pGame->pSpelare[i]) destroySpelare(pGame->pSpelare[i]);
+    if(pGame->pPowerup) destroyPowerup(pGame->pPowerup);
     resetZombies(pGame);
     if(pGame->pZombieImage) destroyZombieImage(pGame->pZombieImage);
     SDL_DestroyTexture(pGame->pGame_StartbackgroundTexture);
@@ -424,6 +462,11 @@ void close(Game *pGame){
 
 int getTime(Game *pGame){
     return (SDL_GetTicks64()-pGame->startTime)/1000;
+}
+
+int getPowertime(Game *pGame)
+{
+    return (SDL_GetTicks64() - pGame->startpowerTime) / 1000;
 }
 
 int getMilli(Game *pGame)
