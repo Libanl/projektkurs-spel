@@ -2,6 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include "../includes/spelare.h"
 #include "../includes/bullet.h"
+#define PLAYER_MAX_X 935
+#define PLAYER_MAX_Y 700
 
 struct spelare
 {
@@ -114,7 +116,7 @@ void moveLeft(Spelare *pSpelare)
 
 void moveRight(Spelare *pSpelare)
 {
-    if (pSpelare->shipRect[pSpelare->frame].x < 970)
+    if (pSpelare->shipRect[pSpelare->frame].x < PLAYER_MAX_X)
     {
         pSpelare->x += pSpelare->hastighet;
         pSpelare->shipRect[pSpelare->frame].x = pSpelare->x;
@@ -154,7 +156,7 @@ void moveUp(Spelare *pSpelare)
 void moveDown(Spelare *pSpelare)
 {
 
-    if (pSpelare->y < 600)
+    if (pSpelare->y < PLAYER_MAX_Y)
     {
         pSpelare->y += pSpelare->hastighet;
     }
