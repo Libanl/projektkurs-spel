@@ -15,6 +15,7 @@
 #include "../../lib/include/zombie.h" // include the zombies header file
 #include "../../lib/include/bullet.h"
 #include "../../lib/include/spelare.h"
+#include "../../lib/include/powerup.h"
 
 
 #define WINDOW_WIDTH 1000
@@ -29,6 +30,7 @@ struct game{
     Bullet *pBullet;
     ZombieImage *pZombieImage;
     Zombie *pZombies[MAX_ZOMBIES];
+    Powerup *pPowerup;
     SDL_Rect zombieRect[MAX_ZOMBIES];
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
@@ -42,6 +44,9 @@ struct game{
     Text *pScoreText, *pOverText, *pStartText, *pTestText;
     int startTime;
     int gameTime;
+    int startpowerTime;
+    int timeforPower;
+    int powerTime;
     GameState state;
     UDPsocket pSocket;
 	UDPpacket *pPacket;
@@ -59,6 +64,7 @@ void run(Game *pGame);
 void close(Game *pGame);
 void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]);
 int getTime(Game *pGame);
+int getPowertime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
 void updateNrOfZombies(Game *pGame);
@@ -154,6 +160,7 @@ int initiate(Game *pGame){
     pGame->MoveDown=0;
     pGame->MoveRight=0;
 
+    pGame->pPowerup= createpowerup(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     for(int i=0;i<MAX_SPELARE;i++){
         pGame->pSpelare[i] = createSpelare(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
@@ -180,6 +187,10 @@ int initiate(Game *pGame){
 
     pGame->Nrofzombies = 0;
     pGame->timeForNextZombie = 3;
+    pGame->timeforPower = 5;
+
+    pGame->startpowerTime =SDL_GetTicks64();
+    pGame->powerTime = -1;
     //resetZombies(pGame);
     return 1;
 }
@@ -229,6 +240,35 @@ void run(Game *pGame){
                 for(int i=0;i<MAX_SPELARE;i++) drawSpelare(pGame->pSpelare[i]);
                     
                 for (int i = 0; i < pGame->Nrofzombies; i++) drawZombie(pGame->pZombies[i]);
+
+                 if(getTime(pGame)>pGame->timeforPower){
+                    drawChest(pGame->pPowerup);
+                }
+                
+                for(int i=0; i<MAX_SPELARE; i++){
+                    if (collideSpelare(pGame->pSpelare[i], getRectchest(pGame->pPowerup))){
+                    removeChest(pGame->pPowerup);
+                    pGame->startpowerTime = -1;
+                    Powerspeed(pGame->pSpelare[i]);
+                    pGame->startpowerTime = SDL_GetTicks64();  // Spara starttiden för kraften
+                    }
+                }
+                
+
+                if (pGame->startpowerTime != -1){  // Om kraften är aktiv
+                    pGame->powerTime = SDL_GetTicks64(); 
+                    if (getPowertime(pGame) >= 5){
+                        for(int i=0; i<MAX_SPELARE; i++) regularspeed(pGame->pSpelare[i]);
+                        pGame->startpowerTime = -1;  // Nollställ starttiden för kraften
+                    }
+                }
+
+                if(getTime(pGame)==20 || getTime(pGame)==40){
+                    int flag;
+                    if(getTime(pGame)==20) flag = 0;
+                    else if(getTime(pGame)==40) flag = 1;
+                    newlocationchest(pGame->pPowerup, flag);
+                }
 
                 for (int k = 0; k < MAX_SPELARE; k++)
                 {
@@ -309,6 +349,11 @@ void close(Game *pGame){
 
 int getTime(Game *pGame){
     return (SDL_GetTicks64()-pGame->startTime)/1000;
+}
+
+int getPowertime(Game *pGame)
+{
+    return (SDL_GetTicks64() - pGame->startpowerTime) / 1000;
 }
 
 int getMilli(Game *pGame)
