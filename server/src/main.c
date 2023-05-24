@@ -47,6 +47,7 @@ struct game{
     int startpowerTime;
     int timeforPower;
     int powerTime;
+    int nrOfKills;
     GameState state;
     UDPsocket pSocket;
 	UDPpacket *pPacket;
@@ -54,6 +55,7 @@ struct game{
     int nrOfClients;
     ServerData sData;
     int nr_of_spelare;
+    
 };
 typedef struct game Game;
 
@@ -188,6 +190,7 @@ int initiate(Game *pGame){
     pGame->Nrofzombies = 0;
     pGame->timeForNextZombie = 3;
     pGame->timeforPower = 5;
+    pGame->nrOfKills=0;
 
     pGame->startpowerTime =SDL_GetTicks64();
     pGame->powerTime = -1;
@@ -443,7 +446,7 @@ void updateNrOfZombies(Game *pGame)
 void sendGameData(Game *pGame){
     pGame->sData.gState = pGame->state;
     for(int i=0;i<MAX_SPELARE;i++){
-        getSpelareSendData(pGame->pSpelare[i], &(pGame->sData.spelare[i]));
+        getSpelareSendData(pGame->pSpelare[i], &(pGame->sData.spelare[i]), pGame->nrOfKills);
     }
     //printf("%d", pGame->Nrofzombies);
     /*if(pGame->Nrofzombies>0){

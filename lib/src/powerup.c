@@ -79,18 +79,3 @@ SDL_Rect getRectchest(Powerup *pPowerup)
     return pPowerup->chestRect;
 }
 
-/*void getPowerupSendData(Powerup *pPowerup, Powerup *pPowerup)
-{
-
-    pSpelareData->x = pSpelare->x;
-    pSpelareData->y = pSpelare->y;
-    //updateSpelare(pSpelare);
-}
-
-void updatePowerupWithRecievedData(Powerup *pPowerup, Powerup *pPowerup)
-{
-    pSpelare->x = pSpelareData->x;
-    pSpelare->y = pSpelareData->y;
-    //updateSpelare(pSpelare);
-}*/
-

@@ -13,11 +13,13 @@ void moveUp(Spelare *pSpelare);
 void moveDown(Spelare *pSpelare);
 void moveLeft(Spelare *pSpelare);
 void moveRight(Spelare *pSpelare);
+void increaseKillCount(Spelare *pSpelare);
+int getKillCount(Spelare *pSpelare);
 void fireSpelare(Spelare *pSpelare, int moveUp, int moveLeft, int moveDown, int moveRight);
 void resetSpelare(Spelare *pSpelare);
 int collideSpelare(Spelare *pSpelare, SDL_Rect rect);
-void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData);
-void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData);
+void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData, int kills);
+void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData, int kills);
 void Powerspeed(Spelare *pSpelare);
 void regularspeed(Spelare *pSpelare);
 #endif
