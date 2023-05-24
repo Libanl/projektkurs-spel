@@ -28,19 +28,22 @@ struct game{
     ZombieImage *pZombieImage;
     Zombie *pZombies[MAX_ZOMBIES];
     Powerup *pPowerup;
+    int nrOfKills;
     int Nrofzombies;
     int timeForNextZombie;
     SDL_Surface *pGame_StartBackgroundimage;
     SDL_Texture *pGame_StartbackgroundTexture;
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
+    SDL_Surface *TextSurface;
+    SDL_Texture *TextTexture;
     int MoveUp;
     int MoveLeft;
     int MoveDown;
     int MoveRight;
     int mouseState;
     TTF_Font *pScoreFont, *pFont, *pOverFont;
-    Text *pScoreText, *pOverText, *pStartText, *pWaitingText, *pTestText;
+    Text *pScoreText, *pOverText, *pStartText, *pWaitingText, *pTestText, *pPlayerNrText;
     int gameTimeM;
     int startTime;//in ms
     int gameTime;//in s
@@ -68,7 +71,7 @@ void updateGameTime(Game *pGame);
 void CheckCollison( Game *pGame, int zombieCount);
 void updateNrOfZombies(Game *pGame);
 void resetZombies(Game *pGame);
-void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData);
+//void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData);
 void updateWithServerData(Game *pGame);
 
  
@@ -199,7 +202,7 @@ int initiate(Game *pGame){
     pGame->Nrofzombies = 0;
     pGame->timeForNextZombie = 3;
     pGame->timeforPower = 5;
-
+    pGame->nrOfKills = 0;
     //resetZombies(pGame);
     pGame->startTime = SDL_GetTicks64();
     pGame->gameTime = -1;
@@ -219,7 +222,9 @@ void run(Game *pGame){
     int pressed = 0;
     int mouseX, mouseY;
     int XPos, YPos;
+    int check=0;
     SDL_Event event;
+    ServerData sData;
     ClientData cData;
     int joining=0;
     int zombieCount = 0;      // Keep track of the current number of zombies
@@ -257,7 +262,18 @@ void run(Game *pGame){
                 }
                 updateGameTime(pGame);
                 SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
+
+                /*SDL_Rect TextRect={830,240,25,35};
+                char NrofPlayer[16];
+                sprintf(NrofPlayer, "player %d", sData.playerNr);
                 
+                SDL_Color textColor= {255,255,255};
+                pGame->TextSurface=TTF_RenderText_Solid(pGame->pFont, NrofPlayer, textColor);
+                pGame->TextTexture=SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->TextSurface);
+                SDL_RenderCopy(pGame->pRenderer, pGame->TextTexture, NULL, &TextRect);*/
+
+                
+
                 for (int i = 0; i < pGame->Nrofzombies; i++){
                     drawZombie(pGame->pZombies[i]);
                 }
@@ -305,12 +321,16 @@ void run(Game *pGame){
                     {
                         if (collideSpelare(pGame->pSpelare[k], getRectZombie(pGame->pZombies[i])))
                         {
+                            if(collideSpelare(pGame->pSpelare[pGame->spelareNr], getRectZombie(pGame->pZombies[i]))){
+                                increaseKillCount(pGame->pSpelare[pGame->spelareNr]);
+                            }
                             destroyZombie(pGame->pZombies[i]);
                             for (int j = i; j < pGame->Nrofzombies - 1; j++)
                             {
                                 pGame->pZombies[j] = pGame->pZombies[j + 1];
                             }
                             pGame->Nrofzombies--;
+                            pGame->nrOfKills++;
                         }
                     }
                 }
@@ -331,7 +351,13 @@ void run(Game *pGame){
             case START:
                 if(!joining){
                     SDL_RenderCopy(pGame->pRenderer, pGame->pGame_StartbackgroundTexture, NULL, NULL);
-                }else{
+                }
+                /*else if(check==1){
+                    for(int i=0;i<MAX_SPELARE;i++){
+                        if(pGame.pSpelare[i].nrOfKills)
+                    }
+                }*/
+                else{
                     SDL_SetRenderDrawColor(pGame->pRenderer,0,0,0,255);
                     SDL_RenderClear(pGame->pRenderer);
                     SDL_SetRenderDrawColor(pGame->pRenderer,230,230,230,255);
@@ -376,7 +402,7 @@ void updateWithServerData(Game *pGame){
     pGame->spelareNr = sData.playerNr;
     pGame->state = sData.gState;
     for(int i=0;i<MAX_SPELARE;i++){
-        updateSpelareWithRecievedData(pGame->pSpelare[i],&(sData.spelare[i]));
+        updateSpelareWithRecievedData(pGame->pSpelare[i],&(sData.spelare[i]), pGame->nrOfKills);
     }
     //printf("%d", pGame->Nrofzombies);
     /*if(pGame->Nrofzombies<0){
@@ -430,8 +456,7 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
 		pGame->pPacket->len = sizeof(ClientData);
         SDLNet_UDP_Send(pGame->pSocket, -1,pGame->pPacket);
 
-}
-       
+    }       
 } 
 
 void close(Game *pGame){

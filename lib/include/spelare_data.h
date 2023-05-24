@@ -23,7 +23,7 @@ typedef struct clientData ClientData;
 typedef struct bulletData BulletData;*/
 
 struct spelareData{
-    int x, y;
+    int x, y, nrOfKills;
     //BulletData bData;
 };
 typedef struct spelareData SpelareData;  

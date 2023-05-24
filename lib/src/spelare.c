@@ -9,6 +9,7 @@ struct spelare
     float x, y, vx, vy;
     int angle;
     int frame;
+    int nrOfKills;
     int nyframe;
     int alive;
     int window_width, window_height;
@@ -28,14 +29,14 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     pSpelare->vx = pSpelare->vy = 0;
     pSpelare->angle = 0;
     pSpelare->hastighet = 5;
-    pSpelare->frame = 7;
-    pSpelare->nyframe = 7;
+    pSpelare->frame = 6;
+    pSpelare->nyframe = 6;
     pSpelare->pBullet = createBullet(pRenderer, window_width, window_height);
     pSpelare->window_width = window_width;
     pSpelare->window_height = window_height;
     pSpelare->flip = SDL_FLIP_NONE;
     pSpelare->pRenderer = pRenderer;
-    SDL_Surface *pSurface = IMG_Load("resources/sprite1.png");
+    SDL_Surface *pSurface = IMG_Load("resources/soldiertest.png");
     if (!pSurface)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -52,48 +53,43 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     // Down spriteSheets
     pSpelare->gsprites[0].x = 0;
     pSpelare->gsprites[0].y = 0;
-    pSpelare->gsprites[0].w = 64;
+    pSpelare->gsprites[0].w = 96;
     pSpelare->gsprites[0].h = 70;
 
-    pSpelare->gsprites[1].x = 64;
+    pSpelare->gsprites[1].x = 288;
     pSpelare->gsprites[1].y = 0;
-    pSpelare->gsprites[1].w = 64;
+    pSpelare->gsprites[1].w = 96;
     pSpelare->gsprites[1].h = 70;
 
     // Left spriteSheets
-    pSpelare->gsprites[2].x = 0;
-    pSpelare->gsprites[2].y = 70;
-    pSpelare->gsprites[2].w = 64;
+    pSpelare->gsprites[2].x = 288;
+    pSpelare->gsprites[2].y = 140;
+    pSpelare->gsprites[2].w = 96;
     pSpelare->gsprites[2].h = 70;
 
-    pSpelare->gsprites[3].x = 64;
-    pSpelare->gsprites[3].y = 70;
-    pSpelare->gsprites[3].w = 64;
+    pSpelare->gsprites[3].x = 480;
+    pSpelare->gsprites[3].y = 140;
+    pSpelare->gsprites[3].w = 96;
     pSpelare->gsprites[3].h = 70;
 
     // Right spriteSheets
     pSpelare->gsprites[4].x = 0;
-    pSpelare->gsprites[4].y = 140;
-    pSpelare->gsprites[4].w = 64;
+    pSpelare->gsprites[4].y = 210;
+    pSpelare->gsprites[4].w = 96;
     pSpelare->gsprites[4].h = 70;
 
-    pSpelare->gsprites[5].x = 64;
-    pSpelare->gsprites[5].y = 140;
-    pSpelare->gsprites[5].w = 64;
+    pSpelare->gsprites[5].x = 288;
+    pSpelare->gsprites[5].y = 210;
+    pSpelare->gsprites[5].w = 96;
     pSpelare->gsprites[5].h = 70;
 
     // Up spriteSheets
-    pSpelare->gsprites[6].x = 0;
-    pSpelare->gsprites[6].y = 210;
-    pSpelare->gsprites[6].w = 64;
+    pSpelare->gsprites[6].x = 480;
+    pSpelare->gsprites[6].y = 0;
+    pSpelare->gsprites[6].w = 96;
     pSpelare->gsprites[6].h = 70;
 
-    pSpelare->gsprites[7].x = 64;
-    pSpelare->gsprites[7].y = 210;
-    pSpelare->gsprites[7].w = 64;
-    pSpelare->gsprites[7].h = 70;
-
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 7; i++)
     {
         pSpelare->shipRect[i] = pSpelare->gsprites[i];
         pSpelare->shipRect[i].w = pSpelare->shipRect[i].w / 1.5;
@@ -112,7 +108,7 @@ void moveLeft(Spelare *pSpelare)
     {
         pSpelare->x -= pSpelare->hastighet;
     }
-    pSpelare->flip = SDL_FLIP_NONE;
+    pSpelare->flip = SDL_FLIP_HORIZONTAL;
     if (pSpelare->frame == 2)
     {
         pSpelare->nyframe = 3;
@@ -132,13 +128,13 @@ void moveRight(Spelare *pSpelare)
         pSpelare->x += pSpelare->hastighet;
     }
     pSpelare->flip = SDL_FLIP_NONE;
-    if (pSpelare->frame == 4)
+    if (pSpelare->frame == 2)
     {
-        pSpelare->nyframe = 5;
+        pSpelare->nyframe = 3;
     }
     else
     {
-        pSpelare->nyframe = 4;
+        pSpelare->nyframe = 2;
     }
     updateSpelare(pSpelare);
 }
@@ -151,13 +147,13 @@ void moveUp(Spelare *pSpelare)
         pSpelare->y -= pSpelare->hastighet;
     }
     pSpelare->flip = SDL_FLIP_NONE;
-    if (pSpelare->frame == 6)
+    if (pSpelare->frame == 4)
     {
-        pSpelare->nyframe = 7;
+        pSpelare->nyframe = 5;
     }
     else
     {
-        pSpelare->nyframe = 6;
+        pSpelare->nyframe = 4;
     }
     updateSpelare(pSpelare);
 }
@@ -179,6 +175,14 @@ void moveDown(Spelare *pSpelare)
         pSpelare->nyframe = 0;
     }
     updateSpelare(pSpelare);
+}
+
+void increaseKillCount(Spelare *pSpelare){
+    pSpelare->nrOfKills++;
+}
+
+int getKillCount(Spelare *pSpelare){
+    return pSpelare->nrOfKills;
 }
 
 void updateSpelare(Spelare *pSpelare)
@@ -217,11 +221,15 @@ void resetSpelare(Spelare *pSpelare)
 {
     pSpelare->x = pSpelare->window_width / 2;
     pSpelare->y = pSpelare->window_height / 2;
+    pSpelare->angle=0;
+    pSpelare->vx=pSpelare->vy=0;
+    pSpelare->nyframe=6;
+    pSpelare->hastighet=5;
 }
 
 void Powerspeed(Spelare *pSpelare)
 {
-    pSpelare->hastighet = 10;
+    pSpelare->hastighet = 13;
 }
 
 void regularspeed(Spelare *pSpelare)
@@ -277,17 +285,16 @@ int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
     return 1; // collision detected
 }
 
-void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData)
+void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData, int kills)
 {
-
     pSpelareData->x = pSpelare->x;
     pSpelareData->y = pSpelare->y;
-    //updateSpelare(pSpelare);
+    pSpelareData->nrOfKills = pSpelare->nrOfKills;
 }
 
-void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData)
+void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData, int kills)
 {
     pSpelare->x = pSpelareData->x;
     pSpelare->y = pSpelareData->y;
-    //updateSpelare(pSpelare);
+    pSpelare->nrOfKills = pSpelareData->nrOfKills;
 }
