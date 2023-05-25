@@ -16,15 +16,8 @@ struct clientData{
 };
 typedef struct clientData ClientData;
 
-/*struct bulletData{
-    float x, y, vx, vy;
-    int time;
-};
-typedef struct bulletData BulletData;*/
-
 struct spelareData{
     int x, y, nrOfKills;
-    //BulletData bData;
 };
 typedef struct spelareData SpelareData;  
 
@@ -36,7 +29,6 @@ typedef struct zombieData ZombieData;
 
 struct serverData{
     SpelareData spelare[MAX_SPELARE];
-    //ZombieData zombie[MAX_ZOMBIES];
     int playerNr;
     GameState gState;
 };

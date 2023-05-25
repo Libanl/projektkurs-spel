@@ -33,6 +33,8 @@ struct game{
     int timeForNextZombie;
     SDL_Surface *pGame_StartBackgroundimage;
     SDL_Texture *pGame_StartbackgroundTexture;
+    SDL_Surface *pleaderboardImage;
+    SDL_Texture *pleaderboardTexture;
     SDL_Surface *pbackgroundImage;
     SDL_Texture *pbackgroundTexture;
     SDL_Surface *TextSurface;
@@ -43,7 +45,7 @@ struct game{
     int MoveRight;
     int mouseState;
     TTF_Font *pScoreFont, *pFont, *pOverFont;
-    Text *pScoreText, *pOverText, *pStartText, *pWaitingText, *pTestText, *pPlayerNrText;
+    Text *pScoreText, *pOverText, *pStartText, *pWaitingText, *pTestText, *pPlayerNrText, *pKillCountText1, *pKillCountText2, *pKillCountText3, *pKillCountText4, *pIDText;
     int gameTimeM;
     int startTime;//in ms
     int gameTime;//in s
@@ -68,6 +70,7 @@ int getTime(Game *pGame);
 int getPowertime(Game *pGame);
 int getMilli(Game *pGame);
 void updateGameTime(Game *pGame);
+void showKillScore(Game *pGame, int nrOfkills[]);
 void CheckCollison( Game *pGame, int zombieCount);
 void updateNrOfZombies(Game *pGame);
 void resetZombies(Game *pGame);
@@ -146,6 +149,20 @@ int initiate(Game *pGame){
         SDL_FreeSurface(pGame->pbackgroundImage);
         return 1;
     }
+    pGame->pleaderboardImage = IMG_Load("resources/latch.jpg");
+    if (!pGame->pbackgroundImage)
+    {
+        printf("Error! backgroundImage failed\n", IMG_GetError());
+        return 1;
+    }
+
+    pGame->pleaderboardTexture = SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->pleaderboardImage);
+    if (!pGame->pbackgroundTexture)
+    {
+        printf("Failed to create background texture: %s\n", SDL_GetError());
+        SDL_FreeSurface(pGame->pbackgroundImage);
+        return 1;
+    }
 
     
     pGame->MoveUp=1;
@@ -154,7 +171,7 @@ int initiate(Game *pGame){
     pGame->MoveRight=0;
     
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
-    pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 70);
+    pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 40);
     pGame->pOverFont = TTF_OpenFont("resources/arial.ttf", 40);
     if(!pGame->pFont || !pGame->pScoreFont){
         printf("Error: %s\n",TTF_GetError());
@@ -217,12 +234,14 @@ int initiate(Game *pGame){
 void run(Game *pGame){
     
     int keys[SDL_NUM_SCANCODES] = {0}; // Initialize an array to store key states
+    int nrOfKills[MAX_SPELARE];
     int isRunning = 1;
     int first = 1;
     int pressed = 0;
     int mouseX, mouseY;
     int XPos, YPos;
     int check=0;
+    int leaderflag=0;
     SDL_Event event;
     ServerData sData;
     ClientData cData;
@@ -263,15 +282,7 @@ void run(Game *pGame){
                 updateGameTime(pGame);
                 SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
 
-                /*SDL_Rect TextRect={830,240,25,35};
-                char NrofPlayer[16];
-                sprintf(NrofPlayer, "player %d", sData.playerNr);
-                
-                SDL_Color textColor= {255,255,255};
-                pGame->TextSurface=TTF_RenderText_Solid(pGame->pFont, NrofPlayer, textColor);
-                pGame->TextTexture=SDL_CreateTextureFromSurface(pGame->pRenderer, pGame->TextSurface);
-                SDL_RenderCopy(pGame->pRenderer, pGame->TextTexture, NULL, &TextRect);*/
-
+              
                 
 
                 for (int i = 0; i < pGame->Nrofzombies; i++){
@@ -281,7 +292,9 @@ void run(Game *pGame){
                 if(pGame->pScoreText) {
                     drawText(pGame->pScoreText);
                 }
-
+                if(pGame->pIDText){
+                    drawText(pGame->pIDText);
+                }
                 for (int i = 0; i < MAX_SPELARE; i++){
                      drawSpelare(pGame->pSpelare[i]); 
                 }
@@ -321,22 +334,39 @@ void run(Game *pGame){
                     {
                         if (collideSpelare(pGame->pSpelare[k], getRectZombie(pGame->pZombies[i])))
                         {
-                            if(collideSpelare(pGame->pSpelare[pGame->spelareNr], getRectZombie(pGame->pZombies[i]))){
+                            nrOfKills[k]++;
+                            /*if(collideSpelare(pGame->pSpelare[pGame->spelareNr], getRectZombie(pGame->pZombies[i]))){
                                 increaseKillCount(pGame->pSpelare[pGame->spelareNr]);
-                            }
+                                //printf("%d", getKillCount(pGame->pSpelare[pGame->spelareNr]));
+                            }*/
                             destroyZombie(pGame->pZombies[i]);
                             for (int j = i; j < pGame->Nrofzombies - 1; j++)
                             {
                                 pGame->pZombies[j] = pGame->pZombies[j + 1];
                             }
                             pGame->Nrofzombies--;
-                            pGame->nrOfKills++;
                         }
                     }
                 }
                 //endTime = SDL_GetTicks();
-                
-                if(getTime(pGame)==60){
+                if(getTime(pGame)>30){
+                    SDL_RenderCopy(pGame->pRenderer, pGame->pleaderboardTexture, NULL, NULL);
+                    if(leaderflag==0)showKillScore(pGame, nrOfKills);
+                    if(pGame->pKillCountText1){
+                        drawText(pGame->pKillCountText1);
+                    }
+                    if(pGame->pKillCountText2){
+                        drawText(pGame->pKillCountText2);
+                    }
+                    if(pGame->pKillCountText3){
+                        drawText(pGame->pKillCountText3);
+                    }
+                    if(pGame->pKillCountText4){
+                        drawText(pGame->pKillCountText4);
+                    }
+                    leaderflag=1;
+                }
+                if(getTime(pGame)==40){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
@@ -402,7 +432,7 @@ void updateWithServerData(Game *pGame){
     pGame->spelareNr = sData.playerNr;
     pGame->state = sData.gState;
     for(int i=0;i<MAX_SPELARE;i++){
-        updateSpelareWithRecievedData(pGame->pSpelare[i],&(sData.spelare[i]), pGame->nrOfKills);
+        updateSpelareWithRecievedData(pGame->pSpelare[i],&(sData.spelare[i]));
     }
     //printf("%d", pGame->Nrofzombies);
     /*if(pGame->Nrofzombies<0){
@@ -468,10 +498,17 @@ void close(Game *pGame){
     if(pGame->pZombieImage) destroyZombieImage(pGame->pZombieImage);
     SDL_DestroyTexture(pGame->pGame_StartbackgroundTexture);
     SDL_FreeSurface(pGame->pGame_StartBackgroundimage);
+    SDL_DestroyTexture(pGame->pleaderboardTexture);
+    SDL_FreeSurface(pGame->pleaderboardImage);
     SDL_DestroyTexture(pGame->pbackgroundTexture);
     SDL_FreeSurface(pGame->pbackgroundImage);
     SDL_DestroyRenderer(pGame->pRenderer);
     SDL_DestroyWindow(pGame->pWindow);
+    if(pGame->pKillCountText1) destroyText(pGame->pKillCountText1);
+    if(pGame->pKillCountText2) destroyText(pGame->pKillCountText2);
+    if(pGame->pKillCountText3) destroyText(pGame->pKillCountText3);
+    if(pGame->pKillCountText4) destroyText(pGame->pKillCountText4);
+    if(pGame->pKillCountText4) destroyText(pGame->pIDText);
     if(pGame->pScoreText) destroyText(pGame->pScoreText);
     if(pGame->pOverText) destroyText(pGame->pOverText);
     if(pGame->pStartText) destroyText(pGame->pStartText);
@@ -499,18 +536,57 @@ int getMilli(Game *pGame)
     return ((SDL_GetTicks64()-pGame->startTime) % 1000) / 100;
 }
 
-void updateGameTime(Game *pGame){
+void updateGameTime(Game *pGame) {
+    if (pGame->pScoreText) {
+        destroyText(pGame->pScoreText);
+    }
+    static char scoreString[30];
+    static char IDstring[30];
+    sprintf(scoreString, "%d.%d", getTime(pGame), getMilli(pGame));
+    sprintf(IDstring, "Player %d", (pGame->spelareNr+1));
+    if (pGame->pScoreFont) {
+        pGame->pScoreText = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, scoreString, WINDOW_WIDTH - 75, 50);
+        pGame->pIDText = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, IDstring, WINDOW_WIDTH - 500, 50);
+    }
+}
 
-        if(pGame->pScoreText) 
-        {
-            destroyText(pGame->pScoreText);
-        }
-        static char scoreString[30];
-        sprintf(scoreString,"%d.%d",getTime(pGame), getMilli(pGame));
-        if(pGame->pScoreFont) 
-        {
-            pGame->pScoreText = createText(pGame->pRenderer,255,255,255,pGame->pScoreFont,scoreString,WINDOW_WIDTH-75,50);    
-        }
+
+void showKillScore(Game *pGame, int nrOfkills[]) {
+    // Print the first kill score
+    //printf("%d\n", nrOfkills[0]);
+
+    // Destroy existing text objects if they exist
+    if (pGame->pKillCountText1) {
+        destroyText(pGame->pKillCountText1);
+    }
+    if (pGame->pKillCountText2) {
+        destroyText(pGame->pKillCountText2);
+    }
+    if (pGame->pKillCountText3) {
+        destroyText(pGame->pKillCountText3);
+    }
+    if (pGame->pKillCountText4) {
+        destroyText(pGame->pKillCountText4);
+    }
+
+    static char KillCountString1[30];
+    static char KillCountString2[30];
+    static char KillCountString3[30];
+    static char KillCountString4[30];
+
+    // Convert kill scores to strings
+    sprintf(KillCountString1, "%d", nrOfkills[0]);
+    sprintf(KillCountString2, "%d", nrOfkills[1]);
+    sprintf(KillCountString3, "%d", nrOfkills[2]);
+    sprintf(KillCountString4, "%d", nrOfkills[3]);
+
+    if (pGame->pScoreFont) {
+        // Create new text objects with the kill scores
+        pGame->pKillCountText1 = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, KillCountString1, WINDOW_WIDTH-175, 250);
+        pGame->pKillCountText2 = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, KillCountString2, WINDOW_WIDTH-175, 300);
+        pGame->pKillCountText3 = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, KillCountString3, WINDOW_WIDTH-175, 350);
+        pGame->pKillCountText4 = createText(pGame->pRenderer, 255, 255, 255, pGame->pScoreFont, KillCountString4, WINDOW_WIDTH-175, 400);
+    }
 }
 
 void resetZombies(Game *pGame)
