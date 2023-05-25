@@ -28,6 +28,7 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     Spelare *pSpelare = malloc(sizeof(struct spelare));
     pSpelare->vx = pSpelare->vy = 0;
     pSpelare->angle = 0;
+    pSpelare->nrOfKills=0;
     pSpelare->hastighet = 5;
     pSpelare->frame = 6;
     pSpelare->nyframe = 6;
@@ -97,7 +98,6 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
         pSpelare->x = x - pSpelare->shipRect[i].w;
         pSpelare->y = y - pSpelare->shipRect[i].h;
     }
-    printf("%d", pSpelare->x);
     return pSpelare;
 }
 
@@ -285,16 +285,16 @@ int collideSpelare(Spelare *pSpelare, SDL_Rect rect)
     return 1; // collision detected
 }
 
-void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData, int kills)
+void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData)
 {
     pSpelareData->x = pSpelare->x;
     pSpelareData->y = pSpelare->y;
-    pSpelareData->nrOfKills = pSpelare->nrOfKills;
+    //pSpelareData->nrOfKills = pSpelare->nrOfKills;
 }
 
-void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData, int kills)
+void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData)
 {
     pSpelare->x = pSpelareData->x;
     pSpelare->y = pSpelareData->y;
-    pSpelare->nrOfKills = pSpelareData->nrOfKills;
+    //pSpelare->nrOfKills = pSpelareData->nrOfKills;
 }
