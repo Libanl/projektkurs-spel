@@ -36,6 +36,8 @@ struct game{
     SDL_Texture *pbackgroundTexture;
     SDL_Surface *pleaderboardImage;
     SDL_Texture *pleaderboardTexture;
+    int plussa;
+    int raknare;
     int Nrofzombies;
     int timeForNextZombie;
     int MoveUp;
@@ -211,6 +213,8 @@ int initiate(Game *pGame){
 
     pGame->startpowerTime =SDL_GetTicks64();
     pGame->powerTime = -1;
+    pGame->raknare = 0;
+    pGame->plussa = 20;
     //resetZombies(pGame);
     return 1;
 }
@@ -313,7 +317,7 @@ void run(Game *pGame){
                     drawText(pGame->pScoreText);
                 }
                 SDL_Delay(10);
-                if(getTime(pGame)>30){
+                if(getTime(pGame)>12){
                     SDL_RenderCopy(pGame->pRenderer, pGame->pleaderboardTexture, NULL, NULL);
                     if(leaderflag==0)showKillScore(pGame, nrOfKills);
                     if(pGame->pKillCountText1){
@@ -330,7 +334,7 @@ void run(Game *pGame){
                     }
                     leaderflag=1;
                 }
-                if(getTime(pGame)==40){
+                if(getTime(pGame)==20){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
@@ -517,9 +521,37 @@ void updateNrOfZombies(Game *pGame)
 {
     if (getTime(pGame) > pGame->timeForNextZombie && pGame->Nrofzombies < MAX_ZOMBIES)
     {
-        (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
-        pGame->pZombies[pGame->Nrofzombies] = createZombie(pGame->pZombieImage, WINDOW_WIDTH, WINDOW_HEIGHT);
+        if(pGame->raknare<5)
+        {
+            (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
+            pGame->pZombies[pGame->Nrofzombies] = createZombieleft(pGame->pZombieImage, WINDOW_WIDTH, WINDOW_HEIGHT - pGame->plussa);
+        }
+        else if(pGame->raknare>=5 && pGame->raknare<10)
+        {
+            (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
+            pGame->pZombies[pGame->Nrofzombies] = createZombierright(pGame->pZombieImage, WINDOW_WIDTH, WINDOW_HEIGHT - pGame->plussa);
+        }
+        else if(pGame->raknare>=10 && pGame->raknare<15)
+        {
+            (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
+            pGame->pZombies[pGame->Nrofzombies] = createZombierup(pGame->pZombieImage, WINDOW_WIDTH - pGame->plussa, WINDOW_HEIGHT);
+        }
+        else if(pGame->raknare>=15 && pGame->raknare<20)
+        {
+            (pGame->timeForNextZombie) = (pGame->timeForNextZombie) + 1; // seconds till next asteroid
+            pGame->pZombies[pGame->Nrofzombies] = createZombiedown(pGame->pZombieImage, WINDOW_WIDTH - pGame->plussa, WINDOW_HEIGHT);
+        }
         pGame->Nrofzombies++;
+        pGame->raknare++;
+        pGame->plussa=pGame->plussa+300;
+        if(pGame->raknare==19)
+        {
+            pGame->raknare=0;
+        }
+        if(WINDOW_HEIGHT<pGame->plussa)
+        {
+            pGame->plussa=0;
+        }
     }
 }
 
