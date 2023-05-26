@@ -2,7 +2,7 @@
 #define spelare_data_h
 
 #define MAX_ZOMBIES 40
-#define MAX_SPELARE 4
+#define MAX_SPELARE 2
 
 enum gameState{START, ONGOING, GAME_OVER};
 typedef enum gameState GameState;

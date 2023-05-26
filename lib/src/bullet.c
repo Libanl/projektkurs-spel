@@ -1,9 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "../includes/bullet.h"
-#include "../includes/zombie.h"
-#include "../includes/spelare.h"
-#include <stdbool.h>
+#include "../../lib/include/spelare_data.h"
+#include "../../lib/include/spelare.h"
+#include "../../lib/include/bullet.h"
 
 struct bullet
 {
@@ -145,7 +144,7 @@ SDL_Rect getRectBullet(Bullet *pBullet)
     return pBullet->bulletRect;
 }
 
-int collideBullet(Bullet *pBullet, SDL_Rect rect)
+/*int collideBullet(Bullet *pBullet, SDL_Rect rect)
 {
     return distance(pBullet->bulletRect.x + pBullet->bulletRect.w / 2, pBullet->bulletRect.y + pBullet->bulletRect.h / 2, rect.x + rect.w / 2, rect.y + rect.h / 2) < (pBullet->bulletRect.w + rect.w) / 2;
-}
+}*/

@@ -10,6 +10,7 @@ Powerup *createpowerup(int x, int y, SDL_Renderer *pRenderer, int window_width, 
 void drawChest(Powerup *pPowerup);
 void removeChest(Powerup *pPowerup);
 SDL_Rect getRectchest(Powerup *pPowerup);
-void newlocationchest(Powerup *pPowerup);
+void newlocationchest(Powerup *pPowerup, int flag);
+void destroyPowerup(Powerup *pPowerup);
 
 #endif

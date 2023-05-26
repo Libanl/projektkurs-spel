@@ -1,10 +1,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "../includes/powerup.h"
+#include "../../lib/include/powerup.h"
 
 struct powerup
 {
-    int x,y;
+    int x, y;
     int window_width, window_height;
     SDL_Renderer *pRenderer;
     SDL_Texture *pTexture;
@@ -35,39 +35,46 @@ Powerup *createpowerup(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     }
     SDL_FreeSurface(pSurface);
     SDL_QueryTexture(pPowerup->pTexture, NULL, NULL, &(pPowerup->chestRect.w), &(pPowerup->chestRect.h));
-    pPowerup->chestRect.w=pPowerup->chestRect.w/12;
-    pPowerup->chestRect.h=pPowerup->chestRect.h/12;
-    pPowerup->chestRect.x=rand() % pPowerup->window_width;
-    pPowerup->chestRect.y= rand() % pPowerup->window_height;
+    pPowerup->chestRect.w = pPowerup->chestRect.w / 12;
+    pPowerup->chestRect.h = pPowerup->chestRect.h / 12;
+    pPowerup->chestRect.x = rand() % pPowerup->window_width;
+    pPowerup->chestRect.y = rand() % pPowerup->window_height;
     return pPowerup;
+}
+void destroyPowerup(Powerup *pPowerup)
+{
+    SDL_DestroyTexture(pPowerup->pTexture);
+    free(pPowerup);
 }
 
 void drawChest(Powerup *pPowerup)
 {
-    SDL_RenderCopyEx(pPowerup->pRenderer, pPowerup->pTexture, NULL, &(pPowerup->chestRect), pPowerup->angle, NULL,pPowerup->flip);
+    SDL_RenderCopyEx(pPowerup->pRenderer, pPowerup->pTexture, NULL, &(pPowerup->chestRect), pPowerup->angle, NULL, pPowerup->flip);
 }
 
 void removeChest(Powerup *pPowerup)
 {
-    pPowerup->chestRect.x=2000;
+    pPowerup->chestRect.x = 2000;
 }
 
-void newlocationchest(Powerup *pPowerup)
+void newlocationchest(Powerup *pPowerup, int flag)
 {
-    if(pPowerup->chestRect.x==2000)
+    if (pPowerup->chestRect.x == 2000)
     {
-    pPowerup->chestRect.x=rand() % pPowerup->window_width;
-    pPowerup->chestRect.y= rand() % pPowerup->window_height;
+        if (flag == 0)
+        {
+            pPowerup->chestRect.x = 350;
+            pPowerup->chestRect.y = 250;
+        }
+        else if (flag == 1)
+        {
+            pPowerup->chestRect.x = 500;
+            pPowerup->chestRect.y = 450;
+        }
     }
 }
-
-
-
-
 
 SDL_Rect getRectchest(Powerup *pPowerup)
 {
     return pPowerup->chestRect;
 }
-
-
