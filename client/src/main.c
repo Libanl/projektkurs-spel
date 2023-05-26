@@ -74,7 +74,6 @@ void showKillScore(Game *pGame, int nrOfkills[]);
 void CheckCollison( Game *pGame, int zombieCount);
 void updateNrOfZombies(Game *pGame);
 void resetZombies(Game *pGame);
-//void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData);
 void updateWithServerData(Game *pGame);
 
  
@@ -206,7 +205,7 @@ int initiate(Game *pGame){
     pGame->nr_of_spelare = MAX_SPELARE;
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Time ran out",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     pGame->pStartText = createText(pGame->pRenderer, 238, 168, 65, pGame->pOverFont, "Press space to start OR M (TO GO BACK TO MENU)", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 + 100);
-    pGame->pWaitingText = createText(pGame->pRenderer,238,168,65,pGame->pScoreFont,"Waiting for server...",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
+    pGame->pWaitingText = createText(pGame->pRenderer,0,255,0,pGame->pScoreFont,"Waiting for server...",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
     pGame->pTestText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"hello world",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
     for(int i=0;i<MAX_SPELARE;i++){
         if(!pGame->pSpelare[i]){

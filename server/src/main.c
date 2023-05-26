@@ -197,7 +197,7 @@ int initiate(Game *pGame){
 
     
     pGame->pOverText = createText(pGame->pRenderer,238,168,65,pGame->pFont,"Time ran out",WINDOW_WIDTH/2,WINDOW_HEIGHT/2);
-    pGame->pStartText = createText(pGame->pRenderer,238,168,65,pGame->pScoreFont,"Waiting for clients..",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
+    pGame->pStartText = createText(pGame->pRenderer,0,255,0,pGame->pScoreFont,"Waiting for clients..",WINDOW_WIDTH/2,WINDOW_HEIGHT/2+100);
     pGame->startTime = SDL_GetTicks64();
     pGame->gameTime = -1;
     pGame->state = START;
@@ -350,7 +350,6 @@ void run(Game *pGame){
                     }       
 
                     if(SDLNet_UDP_Recv(pGame->pSocket,pGame->pPacket)==1){
-
                         add(pGame->pPacket->address,pGame->clients,&(pGame->nrOfClients));
 
                         if (pGame->nrOfClients==MAX_SPELARE)
@@ -423,8 +422,6 @@ void updateGameTime(Game *pGame){
 }
 
 void showKillScore(Game *pGame, int nrOfkills[]) {
-    // Print the first kill score
-    //printf("%d\n", nrOfkills[0]);
 
     // Destroy existing text objects if they exist
     if (pGame->pKillCountText1) {
