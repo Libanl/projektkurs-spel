@@ -352,7 +352,7 @@ void run(Game *pGame){
                     }
                 }
                 //endTime = SDL_GetTicks();
-                if(getTime(pGame)>12){
+                if(getTime(pGame)>60){
                     SDL_RenderCopy(pGame->pRenderer, pGame->pleaderboardTexture, NULL, NULL);
                     if(leaderflag==0)showKillScore(pGame, nrOfKills);
                     if(pGame->pKillCountText1){
@@ -369,7 +369,7 @@ void run(Game *pGame){
                     }
                     leaderflag=1;
                 }
-                if(getTime(pGame)==20){
+                if(getTime(pGame)==70){
                     pGame->state=GAME_OVER;
                 }
                 SDL_RenderPresent(pGame->pRenderer);
