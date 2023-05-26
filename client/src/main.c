@@ -185,7 +185,7 @@ int initiate(Game *pGame){
 		printf("SDLNet_UDP_Open: %s\n", SDLNet_GetError());
 		return 0;
 	}
-	if (SDLNet_ResolveHost(&(pGame->serverAddress), "192.168.56.1", 2000))
+	if (SDLNet_ResolveHost(&(pGame->serverAddress), "127.0.0.1", 2000))
 	{
 		printf("SDLNet_ResolveHost(127.0.0.1 2000): %s\n", SDLNet_GetError());
 		return 0;
