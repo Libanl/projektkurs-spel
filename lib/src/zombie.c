@@ -21,7 +21,6 @@ struct zombie
     SDL_Rect rect;
 };
 
-static void getStartValues(Zombie *a);
 
 ZombieImage *initiateZombie(SDL_Renderer *pRenderer)
 {
@@ -47,7 +46,7 @@ ZombieImage *initiateZombie(SDL_Renderer *pRenderer)
     return pZombieImage;
 }
 
-Zombie *createZombie(ZombieImage *pZombieImage, int window_width, int window_height)
+Zombie *createZombieleft(ZombieImage *pZombieImage, int window_width, int window_height)
 {
     Zombie *pZombie = malloc(sizeof(struct zombie));
     pZombie->pRenderer = pZombieImage->pRenderer;
@@ -57,44 +56,89 @@ Zombie *createZombie(ZombieImage *pZombieImage, int window_width, int window_hei
     SDL_QueryTexture(pZombieImage->pTexture, NULL, NULL, &(pZombie->rect.w), &(pZombie->rect.h));
     pZombie->rect.w /= 4;
     pZombie->rect.h /= 4;
-    getStartValues(pZombie);
+    pZombie->x = 0;
+    pZombie->y= pZombie->window_height /2;
     pZombie->renderAngle = 0;
-    return pZombie;
-}
-
-static void getStartValues(Zombie *pZombie)
-{
-
-    int angle;
-    int randomEdge = rand() % 4;
-    pZombie->x = rand() % pZombie->window_width;
-    pZombie->y = rand() % pZombie->window_height;
-    if (randomEdge == 0)
-    {
-        pZombie->x = 0;
-        angle = rand() % 90 - 45;
-    }
-    else if (randomEdge == 1)
-    {
-        pZombie->y = 0;
-        angle = rand() % 90;
-    }
-    else if (randomEdge == 2)
-    {
-        pZombie->x = pZombie->window_width;
-        angle = (rand() % 90) + 135;
-    }
-    else if (randomEdge == 3)
-    {
-        pZombie->y = pZombie->window_height;
-        angle = (rand() % 90) + 90;
-    }
-    int v = rand() % 8 + 5;
+    int v = 5;
+    int angle=-35;
     pZombie->vx = v * sin(angle * 0.75);
     pZombie->vy = v * cos(angle * 0.75);
     pZombie->rect.x = pZombie->x;
     pZombie->rect.y = pZombie->y;
+    return pZombie;
 }
+
+Zombie *createZombierup(ZombieImage *pZombieImage, int window_width, int window_height)
+{
+    Zombie *pZombie = malloc(sizeof(struct zombie));
+    pZombie->pRenderer = pZombieImage->pRenderer;
+    pZombie->pTexture = pZombieImage->pTexture;
+    pZombie->window_width = window_width;
+    pZombie->window_height = window_height;
+    SDL_QueryTexture(pZombieImage->pTexture, NULL, NULL, &(pZombie->rect.w), &(pZombie->rect.h));
+    pZombie->rect.w /= 4;
+    pZombie->rect.h /= 4;
+    pZombie->x = pZombie->window_width / 2;
+    pZombie->y= 0;
+    pZombie->renderAngle = 0;
+    int v = 5;
+    int angle =180;
+    pZombie->vx = v * sin(angle * 0.75);
+    pZombie->vy = v * cos(angle * 0.75);
+    pZombie->rect.x = pZombie->x;
+    pZombie->rect.y = pZombie->y;
+    return pZombie;
+}
+
+Zombie *createZombierright(ZombieImage *pZombieImage, int window_width, int window_height)
+{
+    Zombie *pZombie = malloc(sizeof(struct zombie));
+    pZombie->pRenderer = pZombieImage->pRenderer;
+    pZombie->pTexture = pZombieImage->pTexture;
+    pZombie->window_width = window_width;
+    pZombie->window_height = window_height;
+    SDL_QueryTexture(pZombieImage->pTexture, NULL, NULL, &(pZombie->rect.w), &(pZombie->rect.h));
+    pZombie->rect.w /= 4;
+    pZombie->rect.h /= 4;
+    pZombie->x = pZombie->window_width;
+    pZombie->y= pZombie->window_height / 2;
+    pZombie->renderAngle = 0;
+    int v = 5;
+    int angle =-45;
+    pZombie->vx = v * sin(angle * 0.75);
+    pZombie->vy = v * cos(angle * 0.75);
+    pZombie->rect.x = pZombie->x;
+    pZombie->rect.y = pZombie->y;
+    return pZombie;
+}
+
+
+Zombie *createZombiedown(ZombieImage *pZombieImage, int window_width, int window_height)
+{
+    Zombie *pZombie = malloc(sizeof(struct zombie));
+    pZombie->pRenderer = pZombieImage->pRenderer;
+    pZombie->pTexture = pZombieImage->pTexture;
+    pZombie->window_width = window_width;
+    pZombie->window_height = window_height;
+    SDL_QueryTexture(pZombieImage->pTexture, NULL, NULL, &(pZombie->rect.w), &(pZombie->rect.h));
+    pZombie->rect.w /= 4;
+    pZombie->rect.h /= 4;
+    pZombie->x = pZombie->window_width /2;
+    pZombie->y = pZombie->window_height;
+    pZombie->renderAngle = 0;
+    int v = 5;
+    int angle=180;
+    pZombie->vx = v * sin(angle * 0.75);
+    pZombie->vy = v * cos(angle * 0.75);
+    pZombie->rect.x = pZombie->x;
+    pZombie->rect.y = pZombie->y;
+    return pZombie;
+}
+
+
+
+
+
 
 void updateZombie(Zombie *pZombie)
 {
@@ -136,27 +180,10 @@ SDL_Rect getRectZombie(Zombie *pZombie)
 
 void destroyZombie(Zombie *pZombie)
 {
-    //SDL_DestroyTexture(pZombie->pTexture);
     free(pZombie);
 }
 
 void destroyZombieImage(ZombieImage *pZombieImage)
 {
     SDL_DestroyTexture(pZombieImage->pTexture);
-}
-
-void getZombieSendData(Zombie *pZombie, ZombieData *pZombieData){
- 
-    pZombieData->x = pZombie->x;
-    pZombieData->y = pZombie->y;
-    pZombieData->vx = pZombie->vx;
-    pZombieData->vy = pZombie->vy;
-}
-
-void updateZombiesWithRecievedData(Zombie *pZombie, ZombieData *pZombieData){
-
-    pZombie->x = pZombieData->x;
-    pZombie->y = pZombieData->y;
-    pZombie->vx = pZombieData->vx;
-    pZombie->vy = pZombieData->vy;
 }
