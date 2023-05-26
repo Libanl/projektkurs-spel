@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "spelare.h": "c",
-        "stdlib.h": "c",
-        "stdio.h": "c",
-        "bullet.h": "c",
-        "music.h": "c"
-    }
-}
