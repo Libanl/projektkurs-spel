@@ -256,7 +256,6 @@ void run(Game *pGame){
                 }
 
                 for(int i=0;i<MAX_SPELARE;i++) updateSpelare(pGame->pSpelare[i]);
-                
                 updateGameTime(pGame);
                 SDL_RenderClear(pGame->pRenderer);        
                 SDL_RenderCopy(pGame->pRenderer, pGame->pbackgroundTexture, NULL, NULL);
