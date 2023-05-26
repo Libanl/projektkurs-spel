@@ -13,4 +13,5 @@ SDL_Rect getRectchest(Powerup *pPowerup);
 void newlocationchest(Powerup *pPowerup, int flag);
 void destroyPowerup(Powerup *pPowerup);
 
+
 #endif
