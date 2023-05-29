@@ -11,7 +11,6 @@
 #include "../../lib/include/music.h"
 #include "../../lib/include/spelare_data.h"
 #include "../../lib/include/zombie.h" // include the zombies header file
-#include "../../lib/include/bullet.h"
 #include "../../lib/include/spelare.h"
 #include "../../lib/include/powerup.h"
 
@@ -23,7 +22,6 @@ struct game{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare[MAX_SPELARE];
-    Bullet *pBullet;
     SDL_Rect zombieRect[MAX_ZOMBIES];
     ZombieImage *pZombieImage;
     Zombie *pZombies[MAX_ZOMBIES];
@@ -41,10 +39,6 @@ struct game{
     SDL_Texture *pbackgroundTexture;
     SDL_Surface *TextSurface;
     SDL_Texture *TextTexture;
-    int MoveUp;
-    int MoveLeft;
-    int MoveDown;
-    int MoveRight;
     int mouseState;
     TTF_Font *pScoreFont, *pFont, *pOverFont;
     Text *pScoreText, *pOverText, *pStartText, *pWaitingText, *pTestText, *pPlayerNrText, *pKillCountText1, *pKillCountText2, *pKillCountText3, *pKillCountText4, *pIDText;
@@ -164,12 +158,6 @@ int initiate(Game *pGame){
         SDL_FreeSurface(pGame->pbackgroundImage);
         return 1;
     }
-
-    
-    pGame->MoveUp=1;
-    pGame->MoveLeft=0;
-    pGame->MoveDown=0;
-    pGame->MoveRight=0;
     
     pGame->pFont = TTF_OpenFont("resources/arial.ttf", 100);
     pGame->pScoreFont = TTF_OpenFont("resources/arial.ttf", 40);
@@ -338,10 +326,6 @@ void run(Game *pGame){
                         if (collideSpelare(pGame->pSpelare[k], getRectZombie(pGame->pZombies[i])))
                         {
                             nrOfKills[k]++;
-                            /*if(collideSpelare(pGame->pSpelare[pGame->spelareNr], getRectZombie(pGame->pZombies[i]))){
-                                increaseKillCount(pGame->pSpelare[pGame->spelareNr]);
-                                //printf("%d", getKillCount(pGame->pSpelare[pGame->spelareNr]));
-                            }*/
                             destroyZombie(pGame->pZombies[i]);
                             for (int j = i; j < pGame->Nrofzombies - 1; j++)
                             {
@@ -385,11 +369,6 @@ void run(Game *pGame){
                 if(!joining){
                     SDL_RenderCopy(pGame->pRenderer, pGame->pGame_StartbackgroundTexture, NULL, NULL);
                 }
-                /*else if(check==1){
-                    for(int i=0;i<MAX_SPELARE;i++){
-                        if(pGame.pSpelare[i].nrOfKills)
-                    }
-                }*/
                 else{
                     SDL_SetRenderDrawColor(pGame->pRenderer,0,0,0,255);
                     SDL_RenderClear(pGame->pRenderer);
@@ -437,13 +416,6 @@ void updateWithServerData(Game *pGame){
     for(int i=0;i<MAX_SPELARE;i++){
         updateSpelareWithRecievedData(pGame->pSpelare[i],&(sData.spelare[i]));
     }
-    //printf("%d", pGame->Nrofzombies);
-    /*if(pGame->Nrofzombies<0){
-        for(int i=0;i<pGame->Nrofzombies;i++){
-            updateZombiesWithRecievedData(pGame->pZombies[i], &(sData.zombie[i]));
-        }
-        printf("%d", pGame->Nrofzombies);
-    }*/
 }
 
 // Function to handle input
@@ -455,36 +427,16 @@ void handleInput(SDL_Event *pEvent, Game *pGame, int keys[]) {
         if (pEvent->key.keysym.scancode==SDL_SCANCODE_W) {
             moveUp(pGame->pSpelare[pGame->spelareNr]);
             cData.command = UP;
-            pGame->MoveUp=1;
-            pGame->MoveLeft=0;
-            pGame->MoveDown=0;
-            pGame->MoveRight=0;
         } if (pEvent->key.keysym.scancode==SDL_SCANCODE_A) {
             moveLeft(pGame->pSpelare[pGame->spelareNr]);
             cData.command = LEFT;
-            pGame->MoveLeft=1;
-            pGame->MoveUp=0;
-            pGame->MoveDown=0;
-            pGame->MoveRight=0;
         } if (pEvent->key.keysym.scancode==SDL_SCANCODE_S) {
             moveDown(pGame->pSpelare[pGame->spelareNr]);
             cData.command = DOWN;
-            pGame->MoveDown=1;
-            pGame->MoveLeft=0;
-            pGame->MoveUp=0;
-            pGame->MoveRight=0;
         } if (pEvent->key.keysym.scancode==SDL_SCANCODE_D) {
             moveRight(pGame->pSpelare[pGame->spelareNr]);
             cData.command = RIGHT;
-            pGame->MoveRight=1;
-            pGame->MoveLeft=0;
-            pGame->MoveDown=0;
-            pGame->MoveUp=0;
-        } if(pEvent->key.keysym.scancode==SDL_SCANCODE_SPACE){
-            fireSpelare(pGame->pSpelare[pGame->spelareNr], pGame->MoveUp, pGame->MoveLeft, pGame->MoveDown, pGame->MoveRight);
-            cData.command = FIRE;
         }
-
         memcpy(pGame->pPacket->data, &cData, sizeof(ClientData));
 		pGame->pPacket->len = sizeof(ClientData);
         SDLNet_UDP_Send(pGame->pSocket, -1,pGame->pPacket);

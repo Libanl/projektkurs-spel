@@ -2,7 +2,6 @@
 #include <SDL2/SDL_image.h>
 #include "../../lib/include/spelare_data.h"
 #include "../../lib/include/spelare.h"
-#include "../../lib/include/bullet.h"
 
 struct spelare
 {
@@ -13,7 +12,6 @@ struct spelare
     int nyframe;
     int alive;
     int window_width, window_height;
-    Bullet *pBullet;
     SpelareData *pSpelareData;
     SDL_Renderer *pRenderer;
     SDL_Texture *pTexture;
@@ -32,7 +30,6 @@ Spelare *createSpelare(int x, int y, SDL_Renderer *pRenderer, int window_width, 
     pSpelare->hastighet = 5;
     pSpelare->frame = 6;
     pSpelare->nyframe = 6;
-    pSpelare->pBullet = createBullet(pRenderer, window_width, window_height);
     pSpelare->window_width = window_width;
     pSpelare->window_height = window_height;
     pSpelare->flip = SDL_FLIP_NONE;
@@ -190,24 +187,10 @@ void updateSpelare(Spelare *pSpelare)
     pSpelare->shipRect[pSpelare->frame].x = pSpelare->x;
     pSpelare->shipRect[pSpelare->frame].y = pSpelare->y;
     pSpelare->frame = pSpelare->nyframe;
-    updateBullet(pSpelare->pBullet);
-}
-
-void fireSpelare(Spelare *pSpelare, int m1, int m2, int m3, int m4)
-{
-    if (!pSpelare->alive || aliveBullet(pSpelare->pBullet))
-        return;
-    int moveUp = m1;
-    int moveLeft = m2;
-    int moveDown = m3;
-    int moveRight = m4;
-    startBullet(pSpelare->pBullet, pSpelare->x + pSpelare->shipRect[pSpelare->frame].w / 2, pSpelare->y + pSpelare->shipRect[pSpelare->frame].h / 2, moveUp, moveLeft, moveDown, moveRight);
 }
 
 void drawSpelare(Spelare *pSpelare)
 {
-    if (aliveBullet(pSpelare->pBullet))
-        drawBullet(pSpelare->pBullet, pSpelare->pRenderer);
     SDL_RenderCopyEx(pSpelare->pRenderer, pSpelare->pTexture, &(pSpelare->gsprites[pSpelare->frame]), &(pSpelare->shipRect[pSpelare->frame]), pSpelare->angle, NULL, pSpelare->flip);
 }
 
@@ -289,12 +272,10 @@ void getSpelareSendData(Spelare *pSpelare, SpelareData *pSpelareData)
 {
     pSpelareData->x = pSpelare->x;
     pSpelareData->y = pSpelare->y;
-    //pSpelareData->nrOfKills = pSpelare->nrOfKills;
 }
 
 void updateSpelareWithRecievedData(Spelare *pSpelare, SpelareData *pSpelareData)
 {
     pSpelare->x = pSpelareData->x;
     pSpelare->y = pSpelareData->y;
-    //pSpelare->nrOfKills = pSpelareData->nrOfKills;
 }

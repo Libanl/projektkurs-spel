@@ -13,7 +13,6 @@
 #include "../../lib/include/text.h"
 #include "../../lib/include/spelare_data.h"
 #include "../../lib/include/zombie.h" // include the zombies header file
-#include "../../lib/include/bullet.h"
 #include "../../lib/include/spelare.h"
 #include "../../lib/include/powerup.h"
 
@@ -27,7 +26,6 @@ struct game{
     SDL_Window *pWindow;
     SDL_Renderer *pRenderer;
     Spelare *pSpelare[MAX_SPELARE];
-    Bullet *pBullet;
     ZombieImage *pZombieImage;
     Zombie *pZombies[MAX_ZOMBIES];
     Powerup *pPowerup;
@@ -175,11 +173,6 @@ int initiate(Game *pGame){
 		close(pGame);
         return 0;
 	}
-    
-    pGame->MoveUp=1;
-    pGame->MoveLeft=0;
-    pGame->MoveDown=0;
-    pGame->MoveRight=0;
 
     pGame->pPowerup= createpowerup(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, pGame->pRenderer, WINDOW_WIDTH, WINDOW_HEIGHT);
     for(int i=0;i<MAX_SPELARE;i++){
@@ -215,7 +208,7 @@ int initiate(Game *pGame){
     pGame->powerTime = -1;
     pGame->raknare = 0;
     pGame->plussa = 20;
-    //resetZombies(pGame);
+
     return 1;
 }
 
@@ -229,7 +222,7 @@ void run(Game *pGame){
     ClientData cData;
     SDL_Event event;
     int zombieCount = 0;
-    int leaderflag=0;      // Keep track of the current number of zombies
+    int leaderflag=0;      
     Uint32 lastSpawnTime = 0; // Keep track of the time since the last zombie spawn
     while (isRunning)
     {   
@@ -372,7 +365,6 @@ void run(Game *pGame){
 void close(Game *pGame){
     stopMus();
     cleanMu();
-    //for (int i = 0; i < pGame->Nrofzombies; i++) if(pGame->pZombies[i]) destroyZombie(pGame->pZombies[i]);  
     for(int i=0;i<MAX_SPELARE;i++) if(pGame->pSpelare[i]) destroySpelare(pGame->pSpelare[i]);
     resetZombies(pGame);
     if(pGame->pZombieImage) destroyZombieImage(pGame->pZombieImage);
@@ -476,34 +468,15 @@ void executeCommand(Game *pGame,ClientData cData){
     {   
         case UP:
             moveUp(pGame->pSpelare[cData.playerNumber]);
-            pGame->MoveUp=1;
-            pGame->MoveLeft=0;
-            pGame->MoveDown=0;
-            pGame->MoveRight=0;
             break;
         case LEFT:
             moveLeft(pGame->pSpelare[cData.playerNumber]);
-            pGame->MoveLeft=1;
-            pGame->MoveUp=0;
-            pGame->MoveDown=0;
-            pGame->MoveRight=0;
             break;
         case DOWN:
             moveDown(pGame->pSpelare[cData.playerNumber]);
-            pGame->MoveDown=1;
-            pGame->MoveLeft=0;
-            pGame->MoveUp=0;
-            pGame->MoveRight=0;
             break;
         case RIGHT:
             moveRight(pGame->pSpelare[cData.playerNumber]);
-            pGame->MoveRight=1;
-            pGame->MoveLeft=0;
-            pGame->MoveDown=0;
-            pGame->MoveUp=0;
-            break;
-        case FIRE:
-            fireSpelare(pGame->pSpelare[cData.playerNumber], pGame->MoveUp, pGame->MoveLeft, pGame->MoveDown, pGame->MoveRight);
             break;
     }
 }
@@ -559,12 +532,6 @@ void sendGameData(Game *pGame){
     for(int i=0;i<MAX_SPELARE;i++){
         getSpelareSendData(pGame->pSpelare[i], &(pGame->sData.spelare[i]));
     }
-    //printf("%d", pGame->Nrofzombies);
-    /*if(pGame->Nrofzombies>0){
-        for(int i=0;i<pGame->Nrofzombies;i++){
-        getZombieSendData(pGame->pZombies[i], &(pGame->sData.zombie[i]));
-        }
-    }*/
     for(int i=0;i<MAX_SPELARE;i++){
         pGame->sData.playerNr = i;
         memcpy(pGame->pPacket->data, &(pGame->sData), sizeof(ServerData));
